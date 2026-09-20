@@ -28,3 +28,20 @@ npm run dev
 - `npm run build` — production build
 - `npm run preview` — preview the production build locally
 - `npm run lint` — run Oxlint
+
+## Media hosting
+
+The case-study prototype video is **not** committed to this repo and is **not**
+included in the build output. Cloudflare Pages rejects single assets over
+25 MiB, and the source video is well past that.
+
+It is served from object storage instead — Cloudflare R2, or AWS S3 if
+deploying on AWS. Point the host's build environment at it:
+
+```
+VITE_CSI_VIDEO_URL=https://<your-bucket-url>/csi-prototype.mp4
+```
+
+See `.env.example`. If the variable is unset, the app falls back to
+`public/videos/csi-prototype.mov`, a gitignored local copy used for
+development only.

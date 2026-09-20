@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Large media served from object storage (R2 / S3) in production.
+# Kept locally for development only — see .env.example (VITE_CSI_VIDEO_URL).
+public/videos/

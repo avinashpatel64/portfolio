@@ -7,7 +7,6 @@ import RevealLines from '../components/RevealLines'
 import useInView from '../hooks/useInView'
 import { isCaseStudyUnlocked } from '../utils/caseStudyAccess'
 import heroImg from '../assets/images/case-study-csi/hero.png'
-import csiPrototypeVideo from '../assets/videos/csi-prototype.mov'
 import wireframesImg from '../assets/images/case-study-csi/wireframes.png'
 import dashboardGroundedImg from '../assets/images/case-study-csi/dashboard-grounded.png'
 import headlessDashboardImg from '../assets/images/case-study-csi/headless-dashboard.png'
@@ -24,6 +23,14 @@ import marketingHomeImg from '../assets/images/case-study-csi/marketing-home.png
 import userTestingImg from '../assets/images/case-study-csi/user-testing.png'
 import eiFigjamImg from '../assets/images/case-study-csi/ei-figjam.png'
 import promptImg from '../assets/images/case-study-csi/prompt.png'
+
+// Served from object storage (Cloudflare R2 / AWS S3) rather than bundled:
+// Cloudflare Pages rejects single assets over 25 MiB, and bundling a video of
+// this size would blow that limit. Set VITE_CSI_VIDEO_URL in the host's build
+// environment. The fallback path is the gitignored copy in public/ used for
+// local development.
+const csiPrototypeVideo =
+  import.meta.env.VITE_CSI_VIDEO_URL || '/videos/csi-prototype.mov'
 
 const keyResponsibilities = [
   {
