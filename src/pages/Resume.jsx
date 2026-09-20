@@ -179,8 +179,10 @@ export default function Resume() {
               Resume
             </RevealLines>
             <RevealLines
-              as="button"
-              type="button"
+              as="a"
+              href="/Resume-Avinash.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
               delay={80}
               className="mb-1 inline-block rounded-full border border-black px-6 py-2 text-sm font-medium text-black transition hover:bg-black hover:text-white"
             >
