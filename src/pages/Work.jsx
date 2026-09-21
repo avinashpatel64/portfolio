@@ -6,16 +6,12 @@ import Reveal from '../components/Reveal'
 import RevealLines from '../components/RevealLines'
 import Toast from '../components/Toast'
 import { CSI_PASSWORD, unlockCaseStudy } from '../utils/caseStudyAccess'
-import workAria from '../assets/images/work-aria.png'
-import workBmc from '../assets/images/work-bmc.png'
-import workCsi from '../assets/images/work-csi.png'
-import workNiagara from '../assets/images/work-niagara.png'
-import workZds from '../assets/images/work-zds.jpg'
+import { mediaUrl } from '../utils/mediaUrl'
 
 const projects = [
   {
     title: 'Customer Signals Intelligence',
-    image: workCsi,
+    image: mediaUrl('images/work-csi.png'),
     caseStudyPath: '/work/customer-signals-intelligence',
     company: 'Salesforce',
     role: 'AI Product Design, Design Strategy & 0-1 Design',
@@ -24,7 +20,7 @@ const projects = [
   },
   {
     title: 'Aria Operations for Networks',
-    image: workAria,
+    image: mediaUrl('images/work-aria.png'),
     company: 'VMware',
     role: 'Product Design, Data Visualisation & Interaction Design',
     summary:
@@ -32,7 +28,7 @@ const projects = [
   },
   {
     title: 'Business Workflows',
-    image: workBmc,
+    image: mediaUrl('images/work-bmc.png'),
     company: 'BMC Helix',
     role: 'Interaction Design, User Research & Design Strategy',
     summary:
@@ -40,7 +36,7 @@ const projects = [
   },
   {
     title: 'Zeus Data Store',
-    image: workZds,
+    image: mediaUrl('images/work-zds.jpg'),
     company: 'Symantec',
     role: 'Interaction Design, Information Arch. & Visual Design',
     summary:
@@ -48,7 +44,7 @@ const projects = [
   },
   {
     title: 'Niagara Marketplace',
-    image: workNiagara,
+    image: mediaUrl('images/work-niagara.png'),
     company: 'Honeywell',
     role: 'User Research, Interaction Design & Visual Design',
     summary:

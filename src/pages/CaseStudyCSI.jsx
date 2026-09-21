@@ -1,36 +1,34 @@
 import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
-import iconPlus from '../assets/images/icon-plus.svg'
 import CTA from '../components/CTA'
 import Reveal from '../components/Reveal'
 import RevealLines from '../components/RevealLines'
 import useInView from '../hooks/useInView'
 import { isCaseStudyUnlocked } from '../utils/caseStudyAccess'
-import heroImg from '../assets/images/case-study-csi/hero.png'
-import wireframesImg from '../assets/images/case-study-csi/wireframes.png'
-import dashboardGroundedImg from '../assets/images/case-study-csi/dashboard-grounded.png'
-import headlessDashboardImg from '../assets/images/case-study-csi/headless-dashboard.png'
-import incidentRecordImg from '../assets/images/case-study-csi/incident-record.png'
-import slackShareImg from '../assets/images/case-study-csi/slack-share.png'
-import omniSupervisorImg from '../assets/images/case-study-csi/omni-supervisor.png'
-import knowledgeAgentImg from '../assets/images/case-study-csi/knowledge-agent.png'
-import lightningPanelImg from '../assets/images/case-study-csi/lightning-panel.png'
-import copilot1Img from '../assets/images/case-study-csi/copilot-1.png'
-import copilot2Img from '../assets/images/case-study-csi/copilot-2.png'
-import customChannelsImg from '../assets/images/case-study-csi/custom-channels.png'
-import rtiSupervisorImg from '../assets/images/case-study-csi/rti-supervisor.png'
-import marketingHomeImg from '../assets/images/case-study-csi/marketing-home.png'
-import userTestingImg from '../assets/images/case-study-csi/user-testing.png'
-import eiFigjamImg from '../assets/images/case-study-csi/ei-figjam.png'
-import promptImg from '../assets/images/case-study-csi/prompt.png'
+import { mediaUrl } from '../utils/mediaUrl'
 
-// Served from object storage (Cloudflare R2 / AWS S3) rather than bundled:
-// Cloudflare Pages rejects single assets over 25 MiB, and bundling a video of
-// this size would blow that limit. Set VITE_CSI_VIDEO_URL in the host's build
-// environment. The fallback path is the gitignored copy in public/ used for
-// local development.
-const csiPrototypeVideo =
-  import.meta.env.VITE_CSI_VIDEO_URL || '/videos/csi-prototype.mov'
+const iconPlus = mediaUrl('images/icon-plus.svg')
+const heroImg = mediaUrl('images/case-study-csi/hero.png')
+const wireframesImg = mediaUrl('images/case-study-csi/wireframes.png')
+const dashboardGroundedImg = mediaUrl('images/case-study-csi/dashboard-grounded.png')
+const headlessDashboardImg = mediaUrl('images/case-study-csi/headless-dashboard.png')
+const incidentRecordImg = mediaUrl('images/case-study-csi/incident-record.png')
+const slackShareImg = mediaUrl('images/case-study-csi/slack-share.png')
+const omniSupervisorImg = mediaUrl('images/case-study-csi/omni-supervisor.png')
+const knowledgeAgentImg = mediaUrl('images/case-study-csi/knowledge-agent.png')
+const lightningPanelImg = mediaUrl('images/case-study-csi/lightning-panel.png')
+const copilot1Img = mediaUrl('images/case-study-csi/copilot-1.png')
+const copilot2Img = mediaUrl('images/case-study-csi/copilot-2.png')
+const customChannelsImg = mediaUrl('images/case-study-csi/custom-channels.png')
+const rtiSupervisorImg = mediaUrl('images/case-study-csi/rti-supervisor.png')
+const marketingHomeImg = mediaUrl('images/case-study-csi/marketing-home.png')
+const userTestingImg = mediaUrl('images/case-study-csi/user-testing.png')
+const eiFigjamImg = mediaUrl('images/case-study-csi/ei-figjam.png')
+const promptImg = mediaUrl('images/case-study-csi/prompt.png')
+
+// Served from object storage rather than bundled because this file exceeds
+// Cloudflare Pages' per-file asset limit.
+const csiPrototypeVideo = mediaUrl('videos/csi-prototype.mov')
 
 const keyResponsibilities = [
   {

@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import iconPlus from '../assets/images/icon-plus.svg'
 import CTA from '../components/CTA'
 import RevealLines from '../components/RevealLines'
 import Reveal from '../components/Reveal'
+import { mediaUrl } from '../utils/mediaUrl'
+
+const iconPlus = mediaUrl('images/icon-plus.svg')
 
 const experience = [
   {
@@ -180,7 +182,7 @@ export default function Resume() {
             </RevealLines>
             <RevealLines
               as="a"
-              href="/Resume-Avinash.pdf"
+              href={mediaUrl('Resume-Avinash.pdf')}
               target="_blank"
               rel="noopener noreferrer"
               delay={80}

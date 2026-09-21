@@ -31,17 +31,24 @@ npm run dev
 
 ## Media hosting
 
-The case-study prototype video is **not** committed to this repo and is **not**
-included in the build output. Cloudflare Pages rejects single assets over
-25 MiB, and the source video is well past that.
+Production media is served from the `media.avinashpatel.in` Cloudflare R2
+custom domain. Set `VITE_MEDIA_BASE_URL` to override that origin. When the
+variable is unset during local development, the app uses the checked-in images
+and `public/` files instead.
 
-It is served from object storage instead — Cloudflare R2, or AWS S3 if
-deploying on AWS. Point the host's build environment at it:
+The case-study prototype video is not committed to the current tree and is not
+included in the Pages output because it exceeds Pages' per-file asset limit.
 
-```
-VITE_CSI_VIDEO_URL=https://<your-bucket-url>/csi-prototype.mp4
-```
+## Continuous deployment
 
-See `.env.example`. If the variable is unset, the app falls back to
-`public/videos/csi-prototype.mov`, a gitignored local copy used for
-development only.
+Pushing to `main` runs `.github/workflows/deploy-pages.yml`, which installs,
+lints, builds, and directly uploads `dist/` to the existing
+`avinashpatel-portfolio` Cloudflare Pages project. The workflow uses direct
+upload and does not require the Cloudflare GitHub app.
+
+An administrator of this GitHub repository must add these Actions secrets:
+
+- `CLOUDFLARE_ACCOUNT_ID` — the Cloudflare account that owns the Pages project
+- `CLOUDFLARE_API_TOKEN` — a scoped token with Account / Cloudflare Pages / Edit
+
+Never commit either value to the repository.

@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import iconPlus from '../assets/images/icon-plus.svg'
+import { mediaUrl } from '../utils/mediaUrl'
 import Reveal from './Reveal'
 import RevealLines from './RevealLines'
+
+const iconPlus = mediaUrl('images/icon-plus.svg')
 
 const faqs = [
   {

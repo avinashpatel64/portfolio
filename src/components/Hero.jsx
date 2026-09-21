@@ -1,6 +1,8 @@
 import useInView from '../hooks/useInView'
+import { mediaUrl } from '../utils/mediaUrl'
 import RevealLines from './RevealLines'
-import heroScreen from '../assets/images/hero-screen.png'
+
+const heroScreen = mediaUrl('images/hero-screen.png')
 
 export default function Hero() {
   const [lineRef, lineInView] = useInView()

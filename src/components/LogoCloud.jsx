@@ -1,17 +1,13 @@
-import logoBmc from '../assets/images/logo-bmc.svg'
-import logoHoneywell from '../assets/images/logo-honeywell.svg'
-import logoSalesforce from '../assets/images/logo-salesforce.svg'
-import logoSymantec from '../assets/images/logo-symantec.svg'
-import logoVmware from '../assets/images/logo-vmware.svg'
+import { mediaUrl } from '../utils/mediaUrl'
 import Reveal from './Reveal'
 import RevealLines from './RevealLines'
 
 const logos = [
-  { src: logoSalesforce, alt: 'Salesforce', className: 'w-32', wrapClassName: 'row-span-2 sm:min-h-full' },
-  { src: logoVmware, alt: 'VMware', className: 'w-40 object-contain' },
-  { src: logoBmc, alt: 'BMC', className: 'w-32' },
-  { src: logoSymantec, alt: 'Symantec', className: 'w-44' },
-  { src: logoHoneywell, alt: 'Honeywell', className: 'w-40' },
+  { src: mediaUrl('images/logo-salesforce.svg'), alt: 'Salesforce', className: 'w-32', wrapClassName: 'row-span-2 sm:min-h-full' },
+  { src: mediaUrl('images/logo-vmware.svg'), alt: 'VMware', className: 'w-40 object-contain' },
+  { src: mediaUrl('images/logo-bmc.svg'), alt: 'BMC', className: 'w-32' },
+  { src: mediaUrl('images/logo-symantec.svg'), alt: 'Symantec', className: 'w-44' },
+  { src: mediaUrl('images/logo-honeywell.svg'), alt: 'Honeywell', className: 'w-40' },
 ]
 
 export default function LogoCloud() {
