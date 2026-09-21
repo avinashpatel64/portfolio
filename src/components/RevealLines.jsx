@@ -26,13 +26,16 @@ function splitIntoLines(measureNode) {
 // correct sizing is what the animated overlay below then positions itself
 // against; measuring off an absolutely-positioned (out-of-flow) copy instead
 // would collapse a flex item to near-zero width before it has visible content.
-function MeasureWords({ text, measureRef }) {
+function MeasureWords({ text, measureRef, boldWords = 0, boldClassName }) {
   const words = (text || '').split(' ')
   return (
     <span aria-hidden="true" ref={measureRef} className="invisible">
       {words.map((word, i) => (
         <span key={i}>
-          <span data-split-word className="inline-block">
+          {/* The emphasised words must carry their real weight here too — bold
+              glyphs are wider, so measuring them at the base weight would
+              produce line breaks the visible text can't honour. */}
+          <span data-split-word className={`inline-block ${i < boldWords ? boldClassName : ''}`}>
             {word}
           </span>
           {i < words.length - 1 ? ' ' : ''}
@@ -42,11 +45,44 @@ function MeasureWords({ text, measureRef }) {
   )
 }
 
-function Lines({ lines, lineOffset, duration, staggerMs, delay, inView, justify }) {
+// Splits one measured line so its leading words (those still inside the
+// emphasised run, counted from the start of the whole text) render bold.
+function renderLine(line, wordsBefore, boldWords, boldClassName) {
+  if (!boldWords) return line
+
+  const words = line.split(' ')
+  const boldCount = Math.min(Math.max(boldWords - wordsBefore, 0), words.length)
+  if (boldCount === 0) return line
+
+  const bold = words.slice(0, boldCount).join(' ')
+  const rest = words.slice(boldCount).join(' ')
+  return (
+    <>
+      <span className={boldClassName}>{bold}</span>
+      {rest ? ` ${rest}` : ''}
+    </>
+  )
+}
+
+function Lines({
+  lines,
+  lineOffset,
+  duration,
+  staggerMs,
+  delay,
+  inView,
+  justify,
+  boldWords = 0,
+  boldClassName,
+}) {
   if (!lines) return null
+
+  let wordsBefore = 0
 
   return lines.map((line, i) => {
     const isLast = i === lines.length - 1
+    const wordsBeforeThisLine = wordsBefore
+    wordsBefore += line.split(' ').length
     const lineDelay = delay + (lineOffset + i) * staggerMs
     // Opacity runs noticeably longer than the slide so the fade reads as its
     // own effect — settling into position and finishing the fade are two
@@ -73,7 +109,7 @@ function Lines({ lines, lineOffset, duration, staggerMs, delay, inView, justify 
             transition: `transform ${duration}ms ${EASE} ${lineDelay}ms, opacity ${fadeDuration}ms ${EASE} ${lineDelay}ms`,
           }}
         >
-          {line}
+          {renderLine(line, wordsBeforeThisLine, boldWords, boldClassName)}
         </span>
       </span>
     )
@@ -94,6 +130,9 @@ export default function RevealLines({
   staggerMs = 90,
   delay = 0,
   justify = false,
+  // Renders the first `bold` words of the text at `boldClassName` weight.
+  bold = 0,
+  boldClassName = 'font-semibold',
   ...rest
 }) {
   const texts = Array.isArray(children) ? children : [children]
@@ -129,6 +168,8 @@ export default function RevealLines({
           delay={delay}
           inView={inView}
           justify={justify}
+          boldWords={bold}
+          boldClassName={boldClassName}
         />
       </Tag>
     )
@@ -148,6 +189,8 @@ export default function RevealLines({
       <Tag ref={containerRef} className={`${className} relative`} {...rest}>
         <MeasureWords
           text={texts[0]}
+          boldWords={bold}
+          boldClassName={boldClassName}
           measureRef={(node) => {
             measureRefs.current[0] = node
           }}
@@ -167,6 +210,8 @@ export default function RevealLines({
             delay={delay}
             inView={inView}
             justify={justify}
+            boldWords={bold}
+            boldClassName={boldClassName}
           />
         </span>
       </Tag>
@@ -181,6 +226,8 @@ export default function RevealLines({
           <Tag key={i} className={`${className} relative`}>
             <MeasureWords
               text={text}
+              boldWords={i === 0 ? bold : 0}
+              boldClassName={boldClassName}
               measureRef={(node) => {
                 measureRefs.current[i] = node
               }}
@@ -194,6 +241,8 @@ export default function RevealLines({
                 delay={delay}
                 inView={inView}
                 justify={justify}
+                boldWords={i === 0 ? bold : 0}
+                boldClassName={boldClassName}
               />
             </span>
           </Tag>

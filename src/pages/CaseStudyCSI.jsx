@@ -160,9 +160,24 @@ const aiUsage = [
 ]
 
 const roadblocks = [
-  { label: 'Integration', title: 'Tableau to Slack to Data Cloud to SDLS' },
-  { label: 'Credit Consumption', title: 'Initial consumption surge challenge' },
-  { label: 'LLM vs SLM', title: 'Do we really need LLM for the task ?' },
+  {
+    label: 'Integration',
+    title: 'Tableau to Slack to Data Cloud to SDLS',
+    description:
+      'Architecting a seamless, end-to-end user experience required bridging complex cross-platform ecosystems—specifically Data Cloud, Slack, and Tableau—each governed by disparate SDLC timelines and release cadences. Navigating these technical boundaries involved balancing rigid constraints through strategic trade-offs: resolving critical blockers, designing around fixed limitations, and intentionally scoping deferred enhancements for future product roadmaps.',
+  },
+  {
+    label: 'Credit Consumption',
+    title: 'Initial consumption surge challenge',
+    description:
+      'A major customer hurdle was the massive data consumption surge triggered upon initial CSI installation, which drained data credits while loading historical context. This friction locked users out of dashboard insights before they could even begin experiencing the product’s value. To resolve this, we implemented a series of holistic product and experience interventions that drastically curbed credit consumption and streamlined onboarding.',
+  },
+  {
+    label: 'LLM vs SLM',
+    title: 'Do we really need LLM for the task ?',
+    description:
+      'Faced with the temptation to apply generative AI to every traditional touchpoint—from knowledge management to case handling—we grounded our design strategy in technical and operational reality. By analyzing compute costs and scoping model complexity (balancing SLMs and LLMs based on task criticality), we negotiated core architectural trade-offs that optimized performance and directly translated into refined, efficient UI workflows.',
+  },
 ]
 
 const visionDemos = [
@@ -173,6 +188,25 @@ const visionDemos = [
     title: 'CSI scenarios for Marketing and Commerce Cloud',
     image: marketingHomeImg,
     widthPercent: 75,
+  },
+]
+
+const outcomes = [
+  {
+    title: 'Shipping & Scale',
+    description: 'Adopted by 6 pilot accounts during the design partner program.',
+  },
+  {
+    title: 'Business & Operational',
+    description: 'Reduced initial-install credit burn by 64%.',
+  },
+  {
+    title: 'Organizational Influence',
+    description: 'Vision Demos secured roadmap commitment.',
+  },
+  {
+    title: 'Research & Validation',
+    description: 'Concept value testing scored 4.7/5 on perceived usefulness.',
   },
 ]
 
@@ -256,6 +290,35 @@ function ListSection({ heading, items }) {
                 </Reveal>
               )
             })}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function TextSection({ heading, bold = 0, headingClassName = '', children }) {
+  return (
+    <section className="px-6 pt-16 pb-[104px] sm:px-10">
+      <div className="border-t border-black" />
+      <div className="pt-[8px] sm:pt-[16px]">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-[10rem_1fr] sm:gap-10">
+          <RevealLines
+            as="h2"
+            className={`text-3xl font-medium tracking-tight text-black sm:text-4xl ${headingClassName}`}
+          >
+            {heading}
+          </RevealLines>
+
+          <div className="sm:ml-auto sm:w-[85%]">
+            <RevealLines
+              as="p"
+              delay={80}
+              bold={bold}
+              className="text-lg font-normal tracking-tight text-black sm:text-2xl"
+            >
+              {children}
+            </RevealLines>
           </div>
         </div>
       </div>
@@ -648,6 +711,12 @@ export default function CaseStudyCSI() {
       </section>
 
       <ListSection heading="Key Responsibilities" items={keyResponsibilities} />
+      <TextSection heading="The Problem" bold={3} headingClassName="whitespace-nowrap">
+        “How might we transform fragmented, fast-paced customer interactions into clear,
+        real-time emotional and behavioral insights so that support agents can dynamically
+        adapt their responses to reduce churn, while supervisors can instantly identify
+        operational risks without suffering from information overload?”
+      </TextSection>
       <ListSection heading="Scenarios" items={scenarios} />
       <ListSection heading="Persona" items={personas} />
       <ColumnSection
@@ -657,6 +726,7 @@ export default function CaseStudyCSI() {
         headingClassName="whitespace-nowrap text-2xl sm:text-3xl"
       />
       <Ecosystem />
+      <FlowsWithImages heading="User Research" items={userResearch} headingClassName="whitespace-nowrap" />
       <WireframesCluster />
       <ListSection heading="Dashboard Goal" items={dashboardOfFuture} />
       <MediaSection heading="Headless Dashboard" image={headlessDashboardImg} imageClassName="opacity-75" />
@@ -679,7 +749,7 @@ export default function CaseStudyCSI() {
       <ListSection heading="Roadblocks Cleared" items={roadblocks} />
       <MediaSection heading="Setup" label="CSI Setup" title="Steps to activate Customer Signals Intelligence" image={customChannelsImg} />
       <FlowsWithImages heading="Vision Demos" items={visionDemos} headingClassName="whitespace-nowrap" />
-      <FlowsWithImages heading="User Research" items={userResearch} />
+      <ColumnSection heading="Outcomes" items={outcomes} cards />
 
       <CTA />
     </main>
