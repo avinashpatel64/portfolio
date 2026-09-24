@@ -25,13 +25,21 @@ export default function Hero() {
       </RevealLines>
 
       <div className="relative mt-16 flex justify-center">
-        {/* Peek window: clips the iPad frame so only its top (screen) shows, cropped at the line below */}
+        {/* Peek window: clips the iPad frame so only its top (screen) shows, cropped at the line below.
+            The 907/591 ratio is derived, not arbitrary: the screenshot letterboxes to
+            bezel + (width - 2*bezel) / 1.52, so 592 is where its bottom edge lands — putting the
+            image's bottom flush with the divider instead of a pixel or two under it.
+            Re-derive this if the hero image's aspect ratio ever changes. */}
         <div
-          className="animate-fade-up-img relative aspect-[907/589] w-full max-w-[907px] overflow-hidden rounded-t-3xl"
+          className="animate-fade-up-img relative aspect-[907/592] w-full max-w-[907px] overflow-hidden rounded-t-3xl"
           style={{ animationDelay: '600ms' }}
         >
-          <div className="absolute inset-x-0 top-0 aspect-[907/644] w-full overflow-hidden rounded-3xl border-2 border-white/50 bg-black shadow-[0px_-4px_20px_0px_rgba(0,0,0,0.1)]">
-            <div className="absolute inset-[16px] overflow-hidden rounded-2xl bg-white">
+          {/* Bezel as a percentage, not a fixed 16px: percentage padding always resolves against
+              the container's width, so the bezel scales with the frame. A fixed value stayed 16px
+              while the frame shrank, eating ~5% of a phone-width frame versus ~2% of a full-width
+              one and visibly shrinking the screen against the iPad body. */}
+          <div className="absolute inset-x-0 top-0 aspect-[907/644] w-full overflow-hidden rounded-3xl border-2 border-white/50 bg-black p-[1.7641%] shadow-[0px_-4px_20px_0px_rgba(0,0,0,0.1)]">
+            <div className="size-full overflow-hidden rounded-2xl bg-white">
               <img
                 src={heroScreen}
                 alt="Product design work sample screenshot"
