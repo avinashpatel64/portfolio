@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import RevealLines from './RevealLines'
+import Reveal from './Reveal'
 
 export default function About() {
   return (
@@ -30,22 +31,22 @@ export default function About() {
       </div>
 
       <div className="mt-8 flex items-center justify-center gap-5 pb-20">
-        <RevealLines
+        <Reveal
           as={Link}
           to="/work"
           delay={400}
           className="rounded-full border border-black px-6 py-2 text-sm font-medium text-black transition hover:bg-black hover:text-white"
         >
           Work
-        </RevealLines>
-        <RevealLines
+        </Reveal>
+        <Reveal
           as={Link}
           to="/resume"
           delay={450}
           className="rounded-full border border-black px-6 py-2 text-sm font-medium text-black transition hover:bg-black hover:text-white"
         >
           Resume
-        </RevealLines>
+        </Reveal>
       </div>
     </section>
   )

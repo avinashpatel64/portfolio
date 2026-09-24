@@ -109,7 +109,7 @@ function ProjectCase({ title, image, company, role, summary, caseStudyPath }) {
             </div>
 
             {caseStudyPath ? (
-              <RevealLines
+              <Reveal
                 as="button"
                 type="button"
                 onClick={() => setShowPasswordModal(true)}
@@ -117,16 +117,16 @@ function ProjectCase({ title, image, company, role, summary, caseStudyPath }) {
                 className="mt-8 inline-block rounded-full border border-black px-6 py-2 text-sm font-medium text-black transition hover:bg-black hover:text-white"
               >
                 Read Case Study
-              </RevealLines>
+              </Reveal>
             ) : (
-              <RevealLines
+              <Reveal
                 as="button"
                 type="button"
                 delay={280}
                 className="mt-8 inline-block rounded-full border border-black px-6 py-2 text-sm font-medium text-black transition hover:bg-black hover:text-white"
               >
                 Read Case Study [wip]
-              </RevealLines>
+              </Reveal>
             )}
           </div>
         </div>

@@ -115,14 +115,14 @@ export default function Contact() {
               />
             </label>
 
-            <RevealLines
+            <Reveal
               as="button"
               type="submit"
               delay={160}
               className="w-fit rounded-full border border-black px-6 py-2 text-sm font-medium text-black transition hover:bg-black hover:text-white"
             >
               Submit
-            </RevealLines>
+            </Reveal>
           </Reveal>
         </div>
       </section>

@@ -180,7 +180,7 @@ export default function Resume() {
             >
               Resume
             </RevealLines>
-            <RevealLines
+            <Reveal
               as="a"
               href={mediaUrl('Resume-Avinash.pdf')}
               target="_blank"
@@ -189,7 +189,7 @@ export default function Resume() {
               className="mb-1 inline-block rounded-full border border-black px-6 py-2 text-sm font-medium text-black transition hover:bg-black hover:text-white"
             >
               Download PDF
-            </RevealLines>
+            </Reveal>
           </div>
 
           <RevealLines
