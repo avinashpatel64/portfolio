@@ -131,12 +131,16 @@ function ProjectCase({ title, image, company, role, summary, caseStudyPath }) {
           </div>
         </div>
 
+        {/* self-start stops the grid stretching this cell to the text column's height.
+            Without it the cell grew tall, and `object-cover` filled that extra height by
+            cropping the screenshot's sides — up to 43% of the image at tablet widths.
+            h-auto keeps the natural aspect ratio, so the image scales down instead. */}
         <Reveal
           duration={1200}
           delay={120}
-          className="overflow-hidden rounded-xl shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)]"
+          className="self-start overflow-hidden rounded-xl shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)]"
         >
-          <img src={image} alt={title} className="h-full w-full object-cover" />
+          <img src={image} alt={title} className="h-auto w-full" />
         </Reveal>
       </div>
 
