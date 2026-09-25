@@ -42,7 +42,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Verify Cloudflare credentials
+      - name: Verify Cloudflare Pages access
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         shell: bash
@@ -51,15 +51,6 @@ jobs:
 
           if [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
             echo "::error::CLOUDFLARE_API_TOKEN is not available to this workflow. Add it as a repository Actions secret."
-            exit 1
-          fi
-
-          verify_response="$(curl --silent --show-error \
-            --header "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
-            https://api.cloudflare.com/client/v4/user/tokens/verify)"
-          if [[ "$(jq -r '.success // false' <<<"${verify_response}")" != "true" ]]; then
-            error_message="$(jq -r '[.errors[]?.message] | join("; ")' <<<"${verify_response}")"
-            echo "::error::Cloudflare API token verification failed: ${error_message:-unknown error}"
             exit 1
           fi
 
