@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom'
 import BackToTopButton from './components/BackToTopButton'
 import Footer from './components/Footer'
 import Navbar from './components/Navbar'
+import CaseStudyAria from './pages/CaseStudyAria'
 import CaseStudyCSI from './pages/CaseStudyCSI'
 import Contact from './pages/Contact'
 import Home from './pages/Home'
@@ -29,6 +30,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/work" element={<Work />} />
           <Route path="/work/customer-signals-intelligence" element={<CaseStudyCSI />} />
+          <Route path="/work/aria-operations-for-networks" element={<CaseStudyAria />} />
           <Route path="/resume" element={<Resume />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>

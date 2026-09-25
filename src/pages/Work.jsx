@@ -13,6 +13,7 @@ const projects = [
     title: 'Customer Signals Intelligence',
     image: mediaUrl('images/work-csi.png'),
     caseStudyPath: '/work/customer-signals-intelligence',
+    gated: true,
     company: 'Salesforce',
     role: 'AI Product Design, Design Strategy & 0-1 Design',
     summary:
@@ -21,6 +22,7 @@ const projects = [
   {
     title: 'Aria Operations for Networks',
     image: mediaUrl('images/work-aria.png'),
+    caseStudyPath: '/work/aria-operations-for-networks',
     company: 'VMware',
     role: 'Product Design, Data Visualisation & Interaction Design',
     summary:
@@ -52,7 +54,7 @@ const projects = [
   },
 ]
 
-function ProjectCase({ title, image, company, role, summary, caseStudyPath }) {
+function ProjectCase({ title, image, company, role, summary, caseStudyPath, gated }) {
   const navigate = useNavigate()
   const [showPasswordModal, setShowPasswordModal] = useState(false)
   const [showToast, setShowToast] = useState(false)
@@ -112,7 +114,7 @@ function ProjectCase({ title, image, company, role, summary, caseStudyPath }) {
               <Reveal
                 as="button"
                 type="button"
-                onClick={() => setShowPasswordModal(true)}
+                onClick={() => (gated ? setShowPasswordModal(true) : navigate(caseStudyPath))}
                 delay={280}
                 className="mt-8 inline-block rounded-full border border-black px-6 py-2 text-sm font-medium text-black transition hover:bg-black hover:text-white"
               >
@@ -138,7 +140,7 @@ function ProjectCase({ title, image, company, role, summary, caseStudyPath }) {
         <Reveal
           duration={1200}
           delay={120}
-          className="self-start overflow-hidden rounded-xl shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)]"
+          className="self-start overflow-hidden rounded-lg shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)]"
         >
           <img src={image} alt={title} className="h-auto w-full" />
         </Reveal>
