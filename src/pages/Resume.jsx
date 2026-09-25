@@ -11,7 +11,7 @@ const experience = [
     date: 'Mar24-Present',
     title: 'Lead UX Designer, Salesforce',
     description:
-      'Set design strategy across Customer Signals Intelligence (CSI) and Survey Feedback Management (SFM), designing AI-driven intelligence that surfaces actionable insights across channels. Lead future-of-Service-Cloud vision work, defining how AI reshapes the service experience — not just the next release.',
+      'Set design strategy across Customer Signals Intelligence (CSI) and Survey Feedback Management (SFM), designing AI-driven intelligence that surfaces actionable insights across channels. Lead future-of-Service-Cloud vision work, defining how AI reshapes the service experience - not just the next release.',
   },
   {
     date: 'May22-Dec23',
@@ -23,7 +23,7 @@ const experience = [
     date: 'Jan16-Apr22',
     title: 'Lead Product Designer, BMC Helix',
     description:
-      'Led UX for Business Workflows — enterprise workflow automation. Designed Innovation Suite, an extensible low-code platform for building ITSM products. Owned design across Innovation Labs (IoT, DataOps), taking multiple 0-to-1 products from research to launch.',
+      'Led UX for Business Workflows - enterprise workflow automation. Designed Innovation Suite, an extensible low-code platform for building ITSM products. Owned design across Innovation Labs (IoT, DataOps), taking multiple 0-to-1 products from research to launch.',
   },
   {
     date: 'Apr13-Dec15',
@@ -41,7 +41,7 @@ const experience = [
     date: 'Earlier',
     title: 'Design Consultant Texity/Qualcomm ...',
     description:
-      'Earlier, Design Consultant, Texity / Qualcomm (2008–2011) and Product Designer, Mangospring (2006–2008) — Research-driven design of enterprise and startup products, concept through ship.',
+      'Earlier, Design Consultant, Texity / Qualcomm (2008-2011) and Product Designer, Mangospring (2006-2008) - Research-driven design of enterprise and startup products, concept through ship.',
   },
 ]
 
@@ -197,12 +197,12 @@ export default function Resume() {
             justify
             className="text-justify text-base font-normal leading-snug text-[#8a8a8a] sm:text-lg"
           >
-            Seasoned product designer working in enterprise SaaS — ITSM, workflow automation,
+            Seasoned product designer working in enterprise SaaS - ITSM, workflow automation,
             AI, and platforms. NID-trained, still close to the craft: I set design direction,
             raise the bar for other designers, and turn future vision into shipped products. At
             Salesforce that means AI-driven feedback intelligence for Service Cloud; at BMC it
             meant Innovation Suite, a platform for building ITSM products. Different companies,
-            same instinct — see where the product is headed, and take it there.
+            same instinct - see where the product is headed, and take it there.
           </RevealLines>
         </div>
       </section>

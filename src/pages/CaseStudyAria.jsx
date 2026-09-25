@@ -67,7 +67,7 @@ const personas = [
     label: 'Cloud Admin',
     title: 'Provide Cloud Infrastructure to Application teams',
     description:
-      'Owns the capacity and configuration that application teams build on, spanning on-premises, VMC and public cloud. Their dashboard leans on inventory and change — hosts and VMs discovered, applications migrated, intent violations to configure — so the infrastructure handed over is known to be sound.',
+      'Owns the capacity and configuration that application teams build on, spanning on-premises, VMC and public cloud. Their dashboard leans on inventory and change - hosts and VMs discovered, applications migrated, intent violations to configure - so the infrastructure handed over is known to be sound.',
   },
   {
     label: 'Network Admin',
@@ -386,7 +386,7 @@ export default function CaseStudyAria() {
           delay={80}
           className="text-lg font-normal tracking-tight text-black sm:text-2xl"
         >
-          Widgets arrive in very different footprints — a tall tabbed table, a narrow column
+          Widgets arrive in very different footprints - a tall tabbed table, a narrow column
           of actions, a squat health tile, a wide alerts strip. Previewing each as a thumbnail
           seemed the obvious move, but at that scale the shapes stopped reading as themselves
           and the set lost its visual consistency. Drag and drop made it worse: a widget

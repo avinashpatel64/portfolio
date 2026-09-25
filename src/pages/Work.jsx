@@ -178,7 +178,7 @@ export default function Work() {
             className="text-justify text-base font-normal leading-snug text-[#8a8a8a] sm:text-lg"
           >
             {[
-              'Over the years, I’ve had the opportunity to work across a wide range of domains—from CRM, Analytics, Networking, ITSM, Security, and Storage to Healthcare.',
+              'Over the years, I’ve had the opportunity to work across a wide range of domains - from CRM, Analytics, Networking, ITSM, Security, and Storage to Healthcare.',
               'My experience has spanned very different environments: from being the third employee at a product startup, where I helped shape things from the ground up, to being one among tens of thousands at an established product company. I’ve worked as a design consultant, led small teams, and contributed as an individual designer across diverse products and challenges. This portfolio showcases a selection of my work, chosen to demonstrate both the breadth of domains and challenges I’ve worked across, and the depth of my approach to design and problem-solving.',
             ]}
           </RevealLines>

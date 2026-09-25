@@ -19,7 +19,7 @@ export default function Contact() {
       `Portfolio contact from ${form.firstName} ${form.lastName}`.trim(),
     )
     const body = encodeURIComponent(
-      `${form.message}\n\n— ${form.firstName} ${form.lastName} (${form.email})`,
+      `${form.message}\n\n- ${form.firstName} ${form.lastName} (${form.email})`,
     )
     window.location.href = `mailto:4avinashp@gmail.com?subject=${subject}&body=${body}`
   }

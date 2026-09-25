@@ -36,15 +36,15 @@ const keyResponsibilities = [
     title: 'Deep-rooted design fundamentals boosted by AI',
     description: [
       'With the emergence of AI, I see an opportunity to amplify the strengths of human-centered design by combining user empathy, human judgment, and product strategy with AI’s ability to analyze, generate, automate, and accelerate. AI has expanded how I explore problems, evaluate possibilities, and move from insight to execution.',
-      'My role has evolved from being a creator of experiences to a strategic orchestrator of product experiences—connecting user needs, business objectives, technology, and AI to shape products that are more useful, adaptive, efficient, and fundamentally human-centered.',
+      'My role has evolved from being a creator of experiences to a strategic orchestrator of product experiences - connecting user needs, business objectives, technology, and AI to shape products that are more useful, adaptive, efficient, and fundamentally human-centered.',
     ],
   },
   {
     label: 'Stakeholder Management',
     title: 'Managing Expectations driving product forward',
     description: [
-      'As a seasoned Product Designer leading design across a complex product ecosystem, one of my key challenges—and opportunities—is aligning diverse stakeholder expectations. I collaborate closely with Leadership, Product Managers, Engineering, QA, and integrated teams to balance business objectives, user needs, technical constraints, and delivery timelines.',
-      'This requires me to wear multiple hats throughout the product lifecycle—as a Facilitator, User Advocate, Collaborator, and Problem Solver—bringing teams together, creating alignment, and driving design decisions that move the product forward.',
+      'As a seasoned Product Designer leading design across a complex product ecosystem, one of my key challenges - and opportunities - is aligning diverse stakeholder expectations. I collaborate closely with Leadership, Product Managers, Engineering, QA, and integrated teams to balance business objectives, user needs, technical constraints, and delivery timelines.',
+      'This requires me to wear multiple hats throughout the product lifecycle - as a Facilitator, User Advocate, Collaborator, and Problem Solver - bringing teams together, creating alignment, and driving design decisions that move the product forward.',
     ],
   },
   {
@@ -59,8 +59,8 @@ const keyResponsibilities = [
     label: 'Vision',
     title: 'Defining the future, one step at a time',
     description: [
-      'A Vision Demo is more than a showcase of a future product experience—it is a powerful mechanism for creating shared understanding, alignment, and momentum across an organization. As a Senior Designer, I have led and created more Vision Demos than anyone else on my team, using them to make complex ideas tangible and bring diverse stakeholders around a common direction.',
-      'I use Vision Demos to visualize the future, challenge existing assumptions, connect cross-functional teams, and turn abstract product strategies into compelling experiences. Ultimately, they serve as a shared north star—helping the product ecosystem align on not just what we are building, but the experience and value we want to create.',
+      'A Vision Demo is more than a showcase of a future product experience - it is a powerful mechanism for creating shared understanding, alignment, and momentum across an organization. As a Senior Designer, I have led and created more Vision Demos than anyone else on my team, using them to make complex ideas tangible and bring diverse stakeholders around a common direction.',
+      'I use Vision Demos to visualize the future, challenge existing assumptions, connect cross-functional teams, and turn abstract product strategies into compelling experiences. Ultimately, they serve as a shared north star - helping the product ecosystem align on not just what we are building, but the experience and value we want to create.',
     ],
   },
 ]
@@ -146,7 +146,7 @@ const dashboardOfFuture = [
     label: 'Integrated',
     title: 'Integrated for end-to-end solution',
     description:
-      'A proactive dashboard is only as effective as the data and systems it connects to. For example In an airline environment, critical information is typically distributed across multiple operational systems—flight operations, crew management, baggage, passenger services, airport systems, maintenance, weather, and customer communication.',
+      'A proactive dashboard is only as effective as the data and systems it connects to. For example In an airline environment, critical information is typically distributed across multiple operational systems - flight operations, crew management, baggage, passenger services, airport systems, maintenance, weather, and customer communication.',
   },
 ]
 
@@ -162,7 +162,7 @@ const roadblocks = [
     label: 'Integration',
     title: 'Tableau to Slack to Data Cloud to SDLS',
     description:
-      'Architecting a seamless, end-to-end user experience required bridging complex cross-platform ecosystems—specifically Data Cloud, Slack, and Tableau—each governed by disparate SDLC timelines and release cadences. Navigating these technical boundaries involved balancing rigid constraints through strategic trade-offs: resolving critical blockers, designing around fixed limitations, and intentionally scoping deferred enhancements for future product roadmaps.',
+      'Architecting a seamless, end-to-end user experience required bridging complex cross-platform ecosystems - specifically Data Cloud, Slack, and Tableau - each governed by disparate SDLC timelines and release cadences. Navigating these technical boundaries involved balancing rigid constraints through strategic trade-offs: resolving critical blockers, designing around fixed limitations, and intentionally scoping deferred enhancements for future product roadmaps.',
   },
   {
     label: 'Credit Consumption',
@@ -174,7 +174,7 @@ const roadblocks = [
     label: 'LLM vs SLM',
     title: 'Do we really need LLM for the task ?',
     description:
-      'Faced with the temptation to apply generative AI to every traditional touchpoint—from knowledge management to case handling—we grounded our design strategy in technical and operational reality. By analyzing compute costs and scoping model complexity (balancing SLMs and LLMs based on task criticality), we negotiated core architectural trade-offs that optimized performance and directly translated into refined, efficient UI workflows.',
+      'Faced with the temptation to apply generative AI to every traditional touchpoint - from knowledge management to case handling - we grounded our design strategy in technical and operational reality. By analyzing compute costs and scoping model complexity (balancing SLMs and LLMs based on task criticality), we negotiated core architectural trade-offs that optimized performance and directly translated into refined, efficient UI workflows.',
   },
 ]
 
@@ -673,7 +673,7 @@ export default function CaseStudyCSI() {
           >
             CSI transforms fragmented customer data into meaningful insights about user
             behaviour, needs, and experiences. The goal is to help teams uncover pain points,
-            anticipate customer needs, and make informed decisions—enabling more relevant,
+            anticipate customer needs, and make informed decisions - enabling more relevant,
             personalised experiences while improving customer satisfaction and business
             outcomes.
           </RevealLines>

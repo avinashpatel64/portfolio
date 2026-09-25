@@ -8,7 +8,7 @@ const iconPlus = mediaUrl('images/icon-plus.svg')
 const faqs = [
   {
     q: 'How do you balance UX with business metrics ?',
-    a: "By treating them as one problem, not two — every flow I design has a metric it's meant to move, and every metric has a user story behind it.",
+    a: "By treating them as one problem, not two - every flow I design has a metric it's meant to move, and every metric has a user story behind it.",
   },
   {
     q: 'Do you approach design from a growth hacking perspective ?',
@@ -20,7 +20,7 @@ const faqs = [
   },
   {
     q: 'How would you resolve conflicts ?',
-    a: 'Get everyone looking at the same evidence — user data, business goals, technical constraints — and the disagreement usually narrows on its own.',
+    a: 'Get everyone looking at the same evidence - user data, business goals, technical constraints - and the disagreement usually narrows on its own.',
   },
 ]
 
