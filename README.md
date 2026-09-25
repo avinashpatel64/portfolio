@@ -46,9 +46,8 @@ lints, builds, and directly uploads `dist/` to the existing
 `avinashpatel-portfolio` Cloudflare Pages project. The workflow uses direct
 upload and does not require the Cloudflare GitHub app.
 
-An administrator of this GitHub repository must add these Actions secrets:
-
-- `CLOUDFLARE_ACCOUNT_ID` — the Cloudflare account that owns the Pages project
-- `CLOUDFLARE_API_TOKEN` — a scoped token with Account / Cloudflare Pages / Edit
-
-Never commit either value to the repository.
+An administrator of this GitHub repository must add the
+`CLOUDFLARE_API_TOKEN` Actions secret. It must be a scoped token with Account /
+Cloudflare Pages / Edit access to the DataOrc account. The non-sensitive
+Cloudflare account ID is stored in the workflow. Never commit the API token to
+the repository.
