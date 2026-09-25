@@ -6,33 +6,37 @@ import Reveal from '../components/Reveal'
 import RevealLines from '../components/RevealLines'
 import useInView from '../hooks/useInView'
 import { mediaUrl } from '../utils/mediaUrl'
+import heroImg from '../assets/images/case-study-aria/hero.png'
+import earlyConceptsImg from '../assets/images/case-study-aria/early-concepts.png'
+import navigationSubImg from '../assets/images/case-study-aria/navigation-sub.png'
+import iconographyFlowImg from '../assets/images/case-study-aria/iconography-flow.png'
+import iconographyGridImg from '../assets/images/case-study-aria/iconography-grid.png'
+import widgetTabsImg from '../assets/images/case-study-aria/widget-tabs-large.png'
+import widgetTopActionsImg from '../assets/images/case-study-aria/widget-top-actions.png'
+import widgetHealthImg from '../assets/images/case-study-aria/widget-health-small.png'
+import widgetAlertsImg from '../assets/images/case-study-aria/widget-alerts-wide.png'
+import finalTemplateEmptyImg from '../assets/images/case-study-aria/final-1-template-empty.png'
+import finalWidgetPickerImg from '../assets/images/case-study-aria/final-2-widget-picker.png'
+import finalWidgetAddedImg from '../assets/images/case-study-aria/final-3-widget-added.png'
+import finalMetricsMenuImg from '../assets/images/case-study-aria/final-4-metrics-menu.png'
 
 const iconPlus = mediaUrl('images/icon-plus.svg')
-const heroImg = mediaUrl('images/case-study-aria/hero.png')
-const earlyConceptsImg = mediaUrl('images/case-study-aria/early-concepts.png')
-const navigationSubImg = mediaUrl('images/case-study-aria/navigation-sub.png')
-const iconographyFlowImg = mediaUrl('images/case-study-aria/iconography-flow.png')
-const iconographyGridImg = mediaUrl('images/case-study-aria/iconography-grid.png')
-const widgetTabsImg = mediaUrl('images/case-study-aria/widget-tabs-large.png')
-const widgetTopActionsImg = mediaUrl('images/case-study-aria/widget-top-actions.png')
-const widgetHealthImg = mediaUrl('images/case-study-aria/widget-health-small.png')
-const widgetAlertsImg = mediaUrl('images/case-study-aria/widget-alerts-wide.png')
 
 const finalInteractionSlides = [
   {
-    src: mediaUrl('images/case-study-aria/final-1-template-empty.png'),
+    src: finalTemplateEmptyImg,
     alt: 'Empty dashboard template ready for widgets',
   },
   {
-    src: mediaUrl('images/case-study-aria/final-2-widget-picker.png'),
+    src: finalWidgetPickerImg,
     alt: 'Suggested widgets panel open beside the dashboard',
   },
   {
-    src: mediaUrl('images/case-study-aria/final-3-widget-added.png'),
+    src: finalWidgetAddedImg,
     alt: 'Dashboard after a widget has been added',
   },
   {
-    src: mediaUrl('images/case-study-aria/final-4-metrics-menu.png'),
+    src: finalMetricsMenuImg,
     alt: 'Metrics menu open, listing the metric widgets available to add',
   },
 ]
