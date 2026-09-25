@@ -430,7 +430,7 @@ function MediaSection({ heading, label, title, image, imageClassName = '', video
               <Reveal
                 duration={700}
                 delay={160}
-                className="overflow-hidden rounded-xl border border-black/10 shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)]"
+                className="overflow-hidden rounded-lg border border-black/10 shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)]"
               >
                 <img src={image} alt={title || heading} className={`w-full object-cover ${imageClassName}`} />
               </Reveal>
@@ -439,7 +439,7 @@ function MediaSection({ heading, label, title, image, imageClassName = '', video
               <Reveal
                 duration={700}
                 delay={160}
-                className="overflow-hidden rounded-xl border border-black/10 shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)]"
+                className="overflow-hidden rounded-lg border border-black/10 shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)]"
               >
                 <video src={video} controls preload="metadata" className="w-full object-cover" />
               </Reveal>
@@ -456,7 +456,7 @@ function WireframeCrop({ box, className = '' }) {
   const { boxW, boxH, imgH, imgLeft, imgTop, imgW, widthPercent } = box
   return (
     <div
-      className={`overflow-hidden rounded-xl border border-black/10 bg-white shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)] ${className} ${widthPercent ? 'sm:w-[70%]' : ''}`}
+      className={`overflow-hidden rounded-lg border border-black/10 bg-white shadow-[0px_1px_1px_0px_rgba(0,0,0,0.25)] ${className} ${widthPercent ? 'sm:w-[70%]' : ''}`}
       style={{ aspectRatio: `${boxW} / ${boxH}` }}
     >
       <div className="relative size-full overflow-hidden">
@@ -535,7 +535,7 @@ function FlowsWithImages({ heading, items, headingClassName = '' }) {
                 </div>
                 {item.image && (
                   <div
-                    className={`overflow-hidden rounded-xl ${
+                    className={`overflow-hidden rounded-lg ${
                       item.widthPercent === 75
                         ? 'sm:w-[75%]'
                         : item.widthPercent
@@ -549,7 +549,7 @@ function FlowsWithImages({ heading, items, headingClassName = '' }) {
                 {item.images && (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 sm:items-stretch">
                     {item.images.map((src, j) => (
-                      <div key={j} className="h-full overflow-hidden rounded-xl border border-black/10">
+                      <div key={j} className="h-full overflow-hidden rounded-lg border border-black/10">
                         <img
                           src={src}
                           alt={`${item.title} ${j + 1}`}
@@ -687,8 +687,15 @@ export default function CaseStudyCSI() {
               delay={240}
               className="relative mx-auto aspect-[907/589] w-[70%] overflow-hidden rounded-t-3xl"
             >
-              <div className="absolute inset-x-0 top-0 aspect-[907/644] w-full overflow-hidden rounded-3xl border-2 border-white/50 bg-black shadow-[0px_-4px_20px_0px_rgba(0,0,0,0.1)]">
-                <div className="absolute inset-[16px] overflow-hidden rounded-2xl bg-white">
+              {/* Bezel as a percentage rather than a fixed 16px: percentage padding resolves
+                  against the container's width, so the screen keeps the same share of the
+                  iPad at every viewport. A fixed value stayed 16px while the frame shrank,
+                  so the screenshot lost ground against the iPad on narrower screens.
+                  1.7641% (16/907) is the same constant the home hero uses. */}
+              <div className="absolute inset-x-0 top-0 aspect-[907/644] w-full overflow-hidden rounded-3xl border-2 border-white/50 bg-black p-[1.7641%] shadow-[0px_-4px_20px_0px_rgba(0,0,0,0.1)]">
+                <div className="size-full overflow-hidden rounded-lg bg-white">
+                  {/* object-contain with no scale: the screenshot shrinks to fit the screen
+                      rather than being zoomed, so nothing is cropped on any edge. */}
                   <img
                     src={heroImg}
                     alt="Customer Signals Intelligence dashboard"

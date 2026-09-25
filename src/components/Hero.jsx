@@ -39,7 +39,7 @@ export default function Hero() {
               while the frame shrank, eating ~5% of a phone-width frame versus ~2% of a full-width
               one and visibly shrinking the screen against the iPad body. */}
           <div className="absolute inset-x-0 top-0 aspect-[907/644] w-full overflow-hidden rounded-3xl border-2 border-white/50 bg-black p-[1.7641%] shadow-[0px_-4px_20px_0px_rgba(0,0,0,0.1)]">
-            <div className="size-full overflow-hidden rounded-2xl bg-white">
+            <div className="size-full overflow-hidden rounded-lg bg-white">
               <img
                 src={heroScreen}
                 alt="Product design work sample screenshot"
