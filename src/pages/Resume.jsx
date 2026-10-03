@@ -90,7 +90,7 @@ function Timeline({ heading, items }) {
                 <RevealLines
                   as="span"
                   delay={80 + i * 80}
-                  className="sm:translate-x-[20px] text-lg font-medium tracking-tight text-black sm:col-start-2 sm:text-2xl"
+                  className="text-lg font-medium tracking-tight text-black sm:col-start-2 sm:pl-[20px] sm:text-2xl"
                 >
                   {item.title}
                 </RevealLines>
@@ -134,7 +134,7 @@ function Timeline({ heading, items }) {
                       <div className="overflow-hidden">
                         <RevealLines
                           as="p"
-                          className="mt-3 sm:translate-x-[20px] text-base leading-snug text-black/70"
+                          className="mt-3 text-base leading-snug text-black/70 sm:pl-[20px]"
                         >
                           {item.description}
                         </RevealLines>

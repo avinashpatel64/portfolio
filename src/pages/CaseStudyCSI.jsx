@@ -266,7 +266,7 @@ function ListSection({ heading, items }) {
                     <RevealLines
                       as="span"
                       delay={110 + i * 80}
-                      className="translate-x-[30px] text-lg font-normal tracking-tight text-black sm:text-2xl"
+                      className="pl-[30px] text-lg font-normal tracking-tight text-black sm:text-2xl"
                     >
                       {item.title}
                     </RevealLines>
@@ -280,7 +280,7 @@ function ListSection({ heading, items }) {
                     className={`grid transition-[grid-template-rows] duration-300 ease-in-out sm:col-start-2 ${isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'}`}
                   >
                     <div className="overflow-hidden">
-                      <RevealLines as="p" className="mt-3 translate-x-[30px] text-base leading-snug text-black/70">
+                      <RevealLines as="p" className="mt-3 pl-[30px] text-base leading-snug text-black/70">
                         {item.description}
                       </RevealLines>
                     </div>
@@ -528,7 +528,7 @@ function FlowsWithImages({ heading, items, headingClassName = '' }) {
                   <RevealLines
                     as="span"
                     delay={110 + i * 80}
-                    className="translate-x-[30px] text-lg font-normal tracking-tight text-black sm:text-2xl"
+                    className="pl-[30px] text-lg font-normal tracking-tight text-black sm:text-2xl"
                   >
                     {item.title}
                   </RevealLines>

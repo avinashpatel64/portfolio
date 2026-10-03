@@ -191,7 +191,7 @@ function LabelledRows({ items }) {
               <RevealLines
                 as="span"
                 delay={110 + i * 80}
-                className="mt-1 block text-lg font-normal tracking-tight text-black sm:mt-0 sm:translate-x-[30px] sm:text-2xl"
+                className="mt-1 block text-lg font-normal tracking-tight text-black sm:mt-0 sm:pl-[30px] sm:text-2xl"
               >
                 {item.title}
               </RevealLines>
@@ -207,7 +207,7 @@ function LabelledRows({ items }) {
               <div className="overflow-hidden">
                 <RevealLines
                   as="p"
-                  className="mt-3 text-base leading-snug text-black/70 sm:translate-x-[30px]"
+                  className="mt-3 text-base leading-snug text-black/70 sm:pl-[30px]"
                 >
                   {item.description}
                 </RevealLines>
