@@ -31,6 +31,7 @@ const projects = [
   {
     title: 'Business Workflows',
     image: mediaUrl('images/work-bmc.png'),
+    caseStudyPath: '/work/business-workflows',
     company: 'BMC Helix',
     role: 'Interaction Design, User Research & Design Strategy',
     summary:
