@@ -182,7 +182,7 @@ export default function Resume() {
             </RevealLines>
             <Reveal
               as="a"
-              href="/Resume-Avinash.pdf"
+              href={mediaUrl('Resume-Avinash.pdf')}
               target="_blank"
               rel="noopener noreferrer"
               delay={80}
