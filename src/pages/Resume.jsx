@@ -32,16 +32,13 @@ const experience = [
       "Designed critical enterprise products and led the team's design output. Aligned designers, engineering, customers, and executives around buildable, shippable UX.",
   },
   {
-    date: 'Apr12-Feb13',
-    title: 'UX Lead, Hcentive/Optum',
-    description:
-      'Led a cross-functional team (interaction, visual, front-end) designing a Health Insurance Exchange (HIX) portal for public and private markets.',
-  },
-  {
     date: 'Earlier',
-    title: 'Design Consultant Texity/Qualcomm ...',
-    description:
-      'Earlier, Design Consultant, Texity / Qualcomm (2008-2011) and Product Designer, Mangospring (2006-2008) - Research-driven design of enterprise and startup products, concept through ship.',
+    title: 'UX Lead Hcentive & Design Consultant Texity',
+    // Two roles share one row, so each paragraph names its own role and dates.
+    description: [
+      'UX Lead, Hcentive/Optum (Apr12-Feb13) - Led a cross-functional team (interaction, visual, front-end) designing a Health Insurance Exchange (HIX) portal for public and private markets.',
+      'Design Consultant, Texity / Qualcomm (2008-2011) and Product Designer, Mangospring (2006-2008) - Research-driven design of enterprise and startup products, concept through ship.',
+    ],
   },
 ]
 
