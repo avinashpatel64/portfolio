@@ -9,8 +9,13 @@ import processAnimationUrl from '../assets/ux-process-animation.html?url'
 // starts when the visitor can actually see it, not on page load.
 function ProcessAnimation() {
   const [ref, inView] = useInView()
+  // 998px = 768px (the old max-w-3xl) + 30%. That is wider than the text column,
+  // so the box is centred on it and capped by the viewport on narrow screens.
   return (
-    <div ref={ref} className="mx-auto w-full max-w-3xl pb-[60px]">
+    <div
+      ref={ref}
+      className="relative left-1/2 w-[min(998px,calc(100vw-64px))] -translate-x-1/2 pb-[120px]"
+    >
       <div className="aspect-[16/9] w-full">
         {inView && (
           <iframe
