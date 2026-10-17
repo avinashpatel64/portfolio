@@ -1,13 +1,33 @@
 import { Link } from 'react-router-dom'
 import RevealLines from './RevealLines'
 import Reveal from './Reveal'
+import useInView from '../hooks/useInView'
+import processAnimationUrl from '../assets/ux-process-animation.html?url'
+
+// The animation is a self-contained page (canvas, plays once, rests on the final
+// frame with a replay button). It is mounted only once scrolled into view so it
+// starts when the visitor can actually see it, not on page load.
+function ProcessAnimation() {
+  const [ref, inView] = useInView()
+  return (
+    <div ref={ref} className="mx-auto aspect-[16/9] w-full max-w-3xl">
+      {inView && (
+        <iframe
+          src={`${processAnimationUrl}?clean=1&mark=${encodeURIComponent('Product Design')}`}
+          title="Product design process animation"
+          scrolling="no"
+          className="size-full border-0"
+        />
+      )}
+    </div>
+  )
+}
 
 export default function About() {
   return (
     <section id="about" className="mx-auto max-w-4xl px-6 pt-20 text-center sm:px-10">
-      <RevealLines as="h2" className="pt-30 pb-5 text-base tracking-tight text-black">
-        Avinash Patel
-      </RevealLines>
+      <h2 className="sr-only">Avinash Patel</h2>
+      <ProcessAnimation />
 
       <div className="mt-8 space-y-4 text-black">
         <RevealLines as="p" delay={80} className="text-xl leading-tight sm:text-2xl">

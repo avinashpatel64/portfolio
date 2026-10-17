@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Design Process</title>
+<style>
+  /* final wordmark: uses the locally installed Hero New Regular, falls back to system sans */
+  @font-face { font-family: 'Hero New'; src: local('Hero New Regular'), local('HeroNew-Regular'); font-weight: 400; font-style: normal; }
+  :root { --bg: #ffffff; --ink: #111111; --muted: #8a8a8a; }
+  html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
+  body.transparent { background: repeating-conic-gradient(#eee 0 25%, #fff 0 50%) 0 0 / 20px 20px; }
+  #stage { position: absolute; inset: 0; display: grid; place-items: center; }
+  #frame { position: relative; }
+  #replay {
+    position: absolute; left: 50%; top: calc(742 / 900 * 100%);
+    width: max(40px, calc(56px * var(--s, 1))); aspect-ratio: 1; border-radius: 50%;
+    border: max(1.5px, calc(2.5px * var(--s, 1))) solid #111; padding: 0; background: #fff; color: #111; cursor: pointer;
+    display: grid; place-items: center;
+    transform: translate(-50%, -50%) scale(.85); opacity: 0; pointer-events: none;
+    transition: opacity .35s ease, transform .35s cubic-bezier(.2,.8,.2,1), background .15s;
+  }
+  #replay.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
+  #replay:hover { background: #f2f2f2; }
+  #replay:active { transform: translate(-50%, -50%) scale(.94); }
+  #replay:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+  #replay svg { width: 38%; height: 38%; overflow: visible; }
+  #replay path { fill: currentColor; stroke: currentColor; stroke-width: max(1.5px, calc(2.5px * var(--s, 1))); stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  canvas { display: block; }
+  #ui {
+    position: fixed; right: 16px; bottom: 16px; display: flex; gap: 6px; align-items: center;
+    font: 500 12px/1 system-ui, -apple-system, Helvetica, sans-serif; color: var(--ink);
+    background: rgba(255,255,255,.92); border: 1px solid #e3e3e3; border-radius: 10px; padding: 6px;
+    transition: opacity .3s; box-shadow: 0 2px 10px rgba(0,0,0,.05);
+  }
+  #ui.hidden { opacity: 0; pointer-events: none; }
+  #ui button {
+    font: inherit; color: inherit; background: none; border: 1px solid transparent; border-radius: 6px;
+    padding: 7px 10px; cursor: pointer;
+  }
+  #ui button:hover { background: #f2f2f2; }
+  #ui button[aria-pressed="true"] { border-color: #cfcfcf; }
+  #time { width: 44px; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  #bar { position: fixed; left: 0; bottom: 0; height: 2px; background: var(--ink); width: 0; opacity: .15; }
+  @media (max-width: 520px) { #ui { left: 16px; right: 16px; justify-content: space-between; flex-wrap: wrap; } }
+</style>
+</head>
+<body>
+<div id="stage"><div id="frame"><canvas id="c"></canvas><button id="replay" aria-label="Replay animation" title="Replay"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3.5v17a1 1 0 0 0 1.5.86l14-8.5a1 1 0 0 0 0-1.72l-14-8.5A1 1 0 0 0 4 3.5z"/></svg></button></div></div>
+<div id="bar"></div>
+<div id="ui">
+  <span id="time">0.0s</span>
+  <button id="play" title="Space">Pause</button>
+  <button id="restart" title="R">Restart</button>
+  <button id="labels" aria-pressed="false" title="L">Labels</button>
+  <button id="bgbtn" aria-pressed="false" title="B">Transparent</button>
+  <button id="rec">Record 1080p</button>
+</div>
+<script>
+/* ------------------------------------------------------------------
+   25s product-design-process morph. Everything is drawn from a fixed pool of
+   "slots" (polylines with an equal point count) plus a pool of dots,
+   so every icon is a true point-by-point morph of the previous one.
+   URL params: ?mark=Text  ?labels=1  ?bg=transparent  ?clean=1  ?loop=1
+------------------------------------------------------------------- */
+const params = new URLSearchParams(location.search);
+const MARK = (params.get('mark') || 'Product Design').slice(0, 24);
+const W = 1600, H = 900;
+const DURATION = 25;
+// The opening single dot holds and breathes for INTRO extra seconds; every other timing
+// below is written on the timeline without that hold (see draw()).
+const INTRO_AT = 0.45, INTRO = 2;
+const N = 180;          // points per stroke
+const BASE_LW = 2.5;    // stroke width in px at 1920x1080
+
+// ---------- geometry ----------
+function resample(pts, n = N) {
+  const cum = [0];
+  for (let i = 1; i < pts.length; i++)
+    cum.push(cum[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  const total = cum[cum.length - 1], out = [];
+  let j = 1;
+  for (let i = 0; i < n; i++) {
+    const d = total * i / (n - 1);
+    while (j < cum.length - 1 && cum[j] < d) j++;
+    const seg = cum[j] - cum[j - 1] || 1, k = (d - cum[j - 1]) / seg;
+    out.push([pts[j - 1][0] + (pts[j][0] - pts[j - 1][0]) * k, pts[j - 1][1] + (pts[j][1] - pts[j - 1][1]) * k]);
+  }
+  return out;
+}
+const line = (x1, y1, x2, y2) => resample([[x1, y1], [x2, y2]]);
+const poly = (...p) => resample(p);
+function circle(cx, cy, r) {
+  const p = [];
+  for (let i = 0; i <= 240; i++) { const a = -Math.PI / 2 + i / 240 * Math.PI * 2; p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); }
+  return resample(p);
+}
+function rrect(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  const p = [], arc = (cx, cy, a0) => { for (let i = 0; i <= 16; i++) { const a = a0 + i / 16 * Math.PI / 2; p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } };
+  p.push([x + r, y]);
+  arc(x + w - r, y + r, -Math.PI / 2);
+  arc(x + w - r, y + h - r, 0);
+  arc(x + r, y + h - r, Math.PI / 2);
+  arc(x + r, y + r, Math.PI);
+  p.push([x + r, y]);
+  return resample(p);
+}
+// speech bubble: rounded rect with a tail on the bottom edge ('l' or 'r')
+function bubble(x, y, w, h, r, side) {
+  const p = [], arc = (cx, cy, a0) => { for (let i = 0; i <= 16; i++) { const a = a0 + i / 16 * Math.PI / 2; p.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); } };
+  const b = y + h;
+  p.push([x + r, y]);
+  arc(x + w - r, y + r, -Math.PI / 2);
+  arc(x + w - r, y + h - r, 0);
+  if (side === 'r') p.push([x + w - 14, b + 14], [x + w - 30, b]);
+  else p.push([x + 34, b], [x + 14, b + 14]);
+  arc(x + r, y + h - r, Math.PI / 2);
+  arc(x + r, y + r, Math.PI);
+  p.push([x + r, y]);
+  return resample(p);
+}
+// shape: pts, fill (0..1), lw (multiplier), col (0 black .. 1 white), op
+const S = (pts, o = {}) => ({ pts, fill: o.fill || 0, lw: o.lw || 1, col: o.col || 0, op: o.op ?? 1 });
+const D = (x, y, r) => ({ x, y, r });
+
+// ---------- scenes ----------
+// Slot meaning is kept consistent so each stroke has a logical successor.
+const SLOTS = 14;
+function scene(slots, dots = [], extra = {}) {
+  const s = new Array(SLOTS).fill(null);
+  for (const k in slots) s[k] = slots[k];
+  return { slots: s, dots, ...extra };
+}
+const gridDots = (r) => {
+  // dots 0 and 1 land where the two origin dots already are
+  const order = [[700, 640], [900, 640]];
+  for (const y of [590, 640, 690]) for (const x of [700, 750, 800, 850, 900])
+    if (!(y === 640 && (x === 700 || x === 900))) order.push([x, y]);
+  return order.map(([x, y]) => D(x, y, r));
+};
+
+// bar chart: axes in slot 7, five bars, a trend line in slot 6, dots on the trend line
+const BAR_BASE = 700, BAR_H = [50, 80, 65, 105, 125], BAR_SLOTS = [2, 0, 4, 5, 3];
+const BAR_X = k => 698 + k * 46;
+const TREND = BAR_H.map((h, k) => [BAR_X(k) + 14, BAR_BASE - h - 16]);
+function chart(flat) {
+  const slots = { 7: S(poly([680, 556], [680, BAR_BASE], [924, BAR_BASE])) };
+  BAR_H.forEach((h, k) => { const hh = flat ? 2 : h; slots[BAR_SLOTS[k]] = S(rrect(BAR_X(k), BAR_BASE - hh, 28, hh, 4)); });
+  if (!flat) slots[6] = S(poly(...TREND), { lw: .8 });
+  return scene(slots, TREND.map(([x, y]) => D(x, y, flat ? 0 : 4)));
+}
+
+const SC = {
+  // 0:00 origin
+  s0a: scene({}, [D(800, 640, 0), D(800, 640, 0)]),
+  s0b: scene({}, [D(800, 640, 8), D(800, 640, 8)]),
+  s0c: scene({ 0: S(line(738, 640, 862, 640)) }, [D(730, 640, 7), D(870, 640, 7)]),
+  // 0:02 conversation — the thread becomes a message, the dots start typing a reply
+  sc: scene({
+    0: S(line(716, 603, 822, 603)),
+    1: S(bubble(700, 585, 140, 56, 14, 'l')),
+    2: S(bubble(782, 662, 112, 46, 14, 'r')),
+    4: S(line(716, 621, 788, 621), { col: .55 }),
+  }, [D(818, 685, 4.5), D(838, 685, 4.5), D(858, 685, 4.5)]),
+  // 0:04 research
+  s1: scene({
+    0: S(line(815, 660, 872, 717), { lw: 1.3 }),
+    1: S(circle(780, 625, 50)),
+  }, gridDots(3.2)),
+  // 0:06 information architecture
+  s2: scene({
+    0: S(line(680, 640, 748, 640)),
+    1: S(rrect(760, 612, 80, 56, 6)),
+    2: S(rrect(590, 612, 80, 56, 6)),
+    3: S(rrect(930, 612, 80, 56, 6)),
+    4: S(line(850, 640, 918, 640)),
+    5: S(poly([740, 633], [749, 640], [740, 647])),
+    6: S(poly([910, 633], [919, 640], [910, 647])),
+  }),
+  // 0:08 testing
+  s3: scene({
+    0: S(poly([781, 616], [796, 631], [822, 601]), { lw: 1.2 }),
+    1: S(circle(800, 615, 70)),
+    2: S(circle(800, 615, 44)),
+    3: S(line(730, 728, 870, 728)),
+  }, [D(800, 728, 7)]),
+  // 0:15 web wireframe — browser window, nav, hero image, copy, CTA
+  s4: scene({
+    0: S(line(820, 608, 940, 608)),
+    1: S(rrect(640, 540, 320, 180, 8)),
+    2: S(rrect(660, 594, 140, 90, 3)),
+    3: S(rrect(820, 656, 70, 24, 3)),
+    4: S(line(820, 624, 932, 624)),
+    5: S(line(820, 638, 910, 638)),
+    6: S(line(660, 594, 800, 684), { lw: .7 }),
+    7: S(line(800, 594, 660, 684), { lw: .7 }),
+    8: S(line(640, 562, 960, 562)),
+    12: S(line(660, 578, 692, 578)),
+    13: S(line(884, 578, 940, 578)),
+  }, [D(654, 551, 3), D(666, 551, 3), D(678, 551, 3)]),
+  // 0:17 visual design
+  s5a: scene({
+    0: S(line(821, 608, 912, 608), { lw: 2.6 }),
+    1: S(rrect(640, 540, 320, 180, 16)),
+    2: S(rrect(660, 594, 140, 90, 10), { fill: 1 }),
+    3: S(rrect(820, 656, 72, 24, 12)),
+    4: S(line(821, 626, 932, 626), { col: .55 }),
+    5: S(line(821, 640, 905, 640), { col: .55 }),
+    8: S(line(640, 562, 960, 562), { col: .55 }),
+    9: S(circle(776, 612, 7), { fill: 1, col: 1 }),
+    10: S(poly([670, 676], [700, 644], [720, 662], [740, 646], [790, 676]), { col: 1, lw: 1.1 }),
+    11: S(line(845, 668, 867, 668), { lw: 1.1 }),
+    12: S(line(661, 578, 684, 578), { lw: 2.2 }),
+    13: S(line(890, 578, 940, 578), { col: .55 }),
+  }, [D(654, 551, 3.4), D(666, 551, 3.4), D(678, 551, 3.4)]),
+  // 0:12 data visualization — UI elements become bars on a chart
+  sv0: chart(true),
+  sv: chart(false),
+};
+
+// [time, scene] — consecutive equal scenes are holds, different ones are morphs
+const BASE_KF = [
+  [0.00, 's0a'], [0.45, 's0b'], [0.95, 's0b'], [1.65, 's0c'], [2.00, 's0c'],
+  [3.00, 'sc'], [4.40, 'sc'],
+  [5.40, 's1'], [6.60, 's1'],
+  [7.60, 's2'], [9.20, 's2'],
+  [10.20, 's3'], [11.40, 's3'],
+  [12.30, 'sv0'], [12.40, 'sv0'], [13.50, 'sv'], [14.00, 'sv'],
+  [14.90, 's4'], [16.30, 's4'],
+  [17.20, 's5a'], [18.20, 's5a'],
+];
+let KF = BASE_KF;   // the layers ending appends its tail
+const LABELS = [
+  [0.0, 2.4, '01', 'Connect', 'Data points & touchpoints'],
+  [2.4, 4.9, '02', 'Conversation', 'Stakeholder & user interviews'],
+  [4.9, 7.1, '03', 'Research', 'User research & data gathering'],
+  [7.1, 9.7, '04', 'Architecture', 'Information architecture & flows'],
+  [9.7, 11.9, '05', 'Testing', 'Usability testing & validation'],
+  [11.9, 14.4, '06', 'Data visualization', 'Metrics & measurable impact'],
+  [14.4, 16.8, '07', 'Structure', 'Low-fidelity web wireframes'],
+  [16.8, 18.7, '08', 'Visual design', 'High-fidelity UI'],
+  [18.7, DURATION - INTRO, '09', 'Product Design', 'Every layer of the craft'],
+];
+
+// ---------- interpolation ----------
+const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const clamp01 = v => Math.max(0, Math.min(1, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const centroid = pts => { let x = 0, y = 0; for (const p of pts) { x += p[0]; y += p[1]; } return [x / pts.length, y / pts.length]; };
+const collapsed = (s, at) => { const c = at || centroid(s.pts); return { pts: s.pts.map(() => c), fill: 0, lw: s.lw, col: s.col, op: 0 }; };
+
+function mix(A, B, e) {
+  const slots = [];
+  for (let i = 0; i < SLOTS; i++) {
+    let a = A.slots[i], b = B.slots[i];
+    if (!a && !b) { slots.push(null); continue; }
+    if (!a) a = collapsed(b, A.anchor);
+    if (!b) b = collapsed(a, B.anchor);
+    slots.push({
+      pts: a.pts.map((p, k) => [lerp(p[0], b.pts[k][0], e), lerp(p[1], b.pts[k][1], e)]),
+      fill: lerp(a.fill, b.fill, e), lw: lerp(a.lw, b.lw, e), col: lerp(a.col, b.col, e), op: lerp(a.op, b.op, e),
+    });
+  }
+  const dots = [], n = Math.max(A.dots.length, B.dots.length);
+  for (let i = 0; i < n; i++) {
+    let a = A.dots[i], b = B.dots[i];
+    if (!a) a = D(b.x, b.y, 0);
+    if (!b) b = D(a.x, a.y, 0);
+    dots.push(D(lerp(a.x, b.x, e), lerp(a.y, b.y, e), lerp(a.r, b.r, e)));
+  }
+  return { slots, dots, extra: [] };
+}
+
+function frameAt(t) {
+  let k = 0;
+  while (k < KF.length - 2 && KF[k + 1][0] <= t) k++;
+  const [t0, a] = KF[k], [t1, b] = KF[k + 1];
+  const f = mix(SC[a], SC[b], a === b ? 0 : ease(clamp01((t - t0) / (t1 - t0))));
+  live(f, t);
+  return f;
+}
+
+// Small "alive" moments layered on top of holds. Each returns to zero at its edges.
+const win = (t, a, b) => (t >= a && t <= b) ? (t - a) / (b - a) : -1;
+const shift = (s, dx, dy) => { if (s) s.pts = s.pts.map(p => [p[0] + dx, p[1] + dy]); };
+const scale = (s, cx, cy, k) => { if (s) s.pts = s.pts.map(p => [cx + (p[0] - cx) * k, cy + (p[1] - cy) * k]); };
+function live(f, t) {
+  let p;
+  // origin pulse
+  if ((p = win(t, 0.35, 1.45)) >= 0) f.extra.push({ ring: [800, 640, 8 + 46 * ease(p)], a: (1 - p) * .5 });
+  if ((p = win(t, 0.45, 0.95)) >= 0) for (const d of f.dots) d.r *= 1 + .22 * Math.sin(Math.PI * p);
+  // conversation: typing indicator bounces
+  if ((p = win(t, 3.00, 4.40)) >= 0) f.dots.forEach((d, i) => { d.y -= 5 * Math.max(0, Math.sin(2 * Math.PI * (p * 2.5 - i * .18))) * Math.min(1, (1 - p) * 6); });
+  // research: lens scans the grid, dots under the glass magnify
+  if ((p = win(t, 5.40, 6.60)) >= 0) {
+    const dx = 46 * Math.sin(2 * Math.PI * p), dy = -6 * Math.sin(4 * Math.PI * p);
+    shift(f.slots[0], dx, dy); shift(f.slots[1], dx, dy);
+    const w = Math.min(1, p * 5, (1 - p) * 5), lx = 780 + dx, ly = 625 + dy;
+    for (const d of f.dots) { const dist = Math.hypot(d.x - lx, d.y - ly); if (dist < 50) d.r *= 1 + w * .9 * (1 - dist / 50); }
+  }
+  // architecture: a signal travels the flow left → right
+  if ((p = win(t, 7.70, 9.10)) >= 0) {
+    const q = ease(p); f.extra.push({ dot: [lerp(630, 970, q), 640, 4.2 * Math.min(1, p * 8, (1 - p) * 8)] });
+  }
+  // testing: check pulses, slider shifts
+  if ((p = win(t, 10.20, 11.40)) >= 0) {
+    scale(f.slots[0], 800, 615, 1 + .16 * Math.sin(Math.PI * Math.min(1, p * 1.6)));
+    if (f.dots[0]) f.dots[0].x += 44 * Math.sin(2 * Math.PI * p);
+  }
+  // wireframe: skeleton shimmer on text lines
+  if ((p = win(t, 14.90, 16.30)) >= 0) [0, 4, 5].forEach((i, j) => {
+    const s = f.slots[i]; if (s) s.op *= 1 - .45 * Math.max(0, Math.sin(Math.PI * 2 * (p * 1.5 - j * .12)));
+  });
+  // visual design: button press
+  if ((p = win(t, 17.20, 18.00)) >= 0) { const k = 1 - .08 * Math.sin(Math.PI * p); scale(f.slots[3], 856, 668, k); scale(f.slots[11], 856, 668, k); }
+  // data viz: bars grow in a stagger, then the trend line draws across and its points pop
+  if ((p = win(t, 12.40, 13.50)) >= 0) BAR_SLOTS.forEach((i, k) => {
+    // scale the finished bar up from its baseline so it keeps its shape while growing
+    const g = Math.max(2 / BAR_H[k], ease(clamp01((p - k * .1) / .6)));
+    f.slots[i].pts = SC.sv.slots[i].pts.map(([x, y]) => [x, BAR_BASE - (BAR_BASE - y) * g]); f.slots[i].op = 1;
+  });
+  if (t >= 12.30 && t < 13.80) {
+    const q = ease(clamp01((t - 12.95) / .7)), s = f.slots[6];
+    if (s) {
+      const full = SC.sv.slots[6].pts, cut = Math.max(1, Math.round(q * (full.length - 1)));
+      s.pts = full.map((pt, n) => full[Math.min(n, cut)]); s.op = q > 0 ? 1 : 0;
+    }
+    f.dots.forEach((d, k) => { d.r = 4 * ease(clamp01((t - (13.05 + k * .13)) / .22)); });
+  }
+}
+
+// ---------- rendering ----------
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let transparent = params.get('bg') === 'transparent', showLabels = params.get('labels') === '1';
+let exportSize = null;
+
+function resize() {
+  if (exportSize) return;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const s = Math.min(innerWidth / W, innerHeight / H);
+  cv.style.width = W * s + 'px'; cv.style.height = H * s + 'px';
+  document.getElementById('frame').style.setProperty('--s', s * 1600 / 1920);
+  cv.width = Math.round(W * s * dpr); cv.height = Math.round(H * s * dpr);
+}
+addEventListener('resize', resize);
+
+const gray = c => { const v = Math.round(17 + (255 - 17) * c); return `rgb(${v},${v},${v})`; };
+let K = 1, LW = 1, G = 1;   // canvas scale, base line width, global fade
+function strokeShape(s, a = 1, lwk = 1, white = 0) {
+  if (!s || s.op * a < .002) return;
+  ctx.beginPath();
+  ctx.moveTo(s.pts[0][0], s.pts[0][1]);
+  for (let i = 1; i < s.pts.length; i++) ctx.lineTo(s.pts[i][0], s.pts[i][1]);
+  const c = gray(s.col);
+  if (white) { ctx.globalAlpha = a * white * G; ctx.fillStyle = '#fff'; ctx.fill(); }
+  // fill snaps in late in the morph so shapes never pass through a muddy grey
+  if (s.fill > .002) { ctx.globalAlpha = s.op * Math.pow(s.fill, 4) * a * G; ctx.fillStyle = c; ctx.fill(); }
+  ctx.globalAlpha = s.op * a * G; ctx.strokeStyle = c; ctx.lineWidth = LW * s.lw * lwk / K; ctx.stroke();
+}
+function dot(x, y, r, a = 1) {
+  if (r <= .05 || a <= .002) return;
+  ctx.globalAlpha = a * G; ctx.fillStyle = gray(0); ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+}
+function ring(cx, cy, r, a = 1, lwk = 1, from = -Math.PI / 2, sweep = Math.PI * 2) {
+  if (a <= .002 || r <= 0 || sweep <= 0) return;
+  ctx.globalAlpha = a * G; ctx.strokeStyle = gray(0); ctx.lineWidth = LW * lwk / K;
+  ctx.beginPath(); ctx.arc(cx, cy, r, from, from + sweep); ctx.stroke();
+}
+function box(cx, cy, w, h, r, { a = 1, lwk = 1, fill = 0 } = {}) {
+  if (a <= .002 || w <= .5) return;
+  ctx.beginPath(); ctx.roundRect(cx - w / 2, cy - h / 2, w, h, Math.min(r, w / 2, h / 2));
+  if (fill > .002) { ctx.globalAlpha = a * fill * G; ctx.fillStyle = gray(0); ctx.fill(); }
+  ctx.globalAlpha = a * G; ctx.strokeStyle = gray(0); ctx.lineWidth = LW * lwk / K; ctx.stroke();
+}
+// text centred on (cx, cy) by its actual ink bounds, not the em box
+const WORDMARK_FONT = '400 34px "Hero New", Inter, system-ui, -apple-system, Helvetica, sans-serif';
+function wordmark(str, cx, cy, a = 1) {
+  if (a <= .002) return;
+  ctx.globalAlpha = a * G; ctx.fillStyle = gray(0); ctx.font = WORDMARK_FONT;
+  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+  const m = ctx.measureText(str);
+  const x = cx - (m.actualBoundingBoxRight - m.actualBoundingBoxLeft) / 2;
+  const y = cy + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
+  ctx.fillText(str, x, y);
+}
+function label(str, x, y, size, a = 1, weight = 600, spacing = 0) {
+  if (a <= .002) return;
+  ctx.globalAlpha = a * G; ctx.fillStyle = gray(0);
+  ctx.font = `${weight} ${size}px Inter, "SF Pro Display", system-ui, -apple-system, Helvetica, sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  if ('letterSpacing' in ctx) ctx.letterSpacing = spacing + 'px';
+  ctx.fillText(str, x, y);
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+}
+function draw(t, loopFade) {
+  K = cv.width / W; LW = BASE_LW * cv.width / 1920;
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  if (!transparent) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); }
+  ctx.setTransform(K, 0, 0, K, 0, 0);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  G = loopFade ? 1 - clamp01((t - (DURATION - .3)) / .3) : 1;
+  const real = t;
+  t = t <= INTRO_AT ? t : Math.max(INTRO_AT, t - INTRO);
+  if (t >= 18.2) drawLayers(t);
+  if (t < HANDOFF) {
+    const f = frameAt(t);
+    // intro hold: the dot breathes and sends out slow ripples
+    if (real > INTRO_AT && real < INTRO_AT + INTRO) {
+      const u = real - INTRO_AT;
+      for (const d of f.dots) d.r *= 1 + .14 * Math.sin(Math.PI * 2 * u / 1.0);
+    }
+    for (const e of [0.55, 1.25, 1.95]) { const p = (real - e) / 1.0; if (p >= 0 && p <= 1) ring(800, 640, 8 + 46 * ease(p), (1 - p) * .5, .6); }
+    for (const s of f.slots) strokeShape(s);
+    for (const d of f.dots) dot(d.x, d.y, d.r);
+    for (const x of f.extra) {
+      if (x.ring) ring(...x.ring, x.a, .6);
+      if (x.dot) dot(...x.dot);
+    }
+  }
+  if (showLabels) drawLabel(t, G);
+  ctx.globalAlpha = 1;
+}
+function drawLabel(t, g) {
+  const L = LABELS.find(l => t >= l[0] && t < l[1]) || LABELS[LABELS.length - 1];
+  const a = Math.min(1, (t - L[0]) / .35, (L[1] - t) / .35) * g;
+  if (a <= 0) return;
+  ctx.globalAlpha = a; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+  ctx.fillStyle = '#111'; ctx.font = '600 15px Inter, system-ui, -apple-system, Helvetica, sans-serif';
+  ctx.fillText(`${L[2]}  ${L[3].toUpperCase()}`.split('').join(' '), 800, 838);
+  ctx.fillStyle = '#8a8a8a'; ctx.font = '400 14px Inter, system-ui, -apple-system, Helvetica, sans-serif';
+  ctx.fillText(L[4], 800, 862);
+}
+
+// ---------- ending: layers ----------
+// An exploded view of every stage, stacked bottom-up in stage order, pressed into one card.
+// The visual-design stage morphs into the top layer and the ending draws everything after HANDOFF.
+const HANDOFF = 19.0;
+const seg = (t, a, b) => clamp01((t - a) / (b - a));
+const bump = (t, at, w = .15) => Math.exp(-Math.pow((t - at) / w, 2));
+
+const LS = 1.25;   // overall size of the layer stack
+const LY = {
+  order: ['s0c', 'sc', 's1', 's2', 's3', 'sv', 's4', 's5a'],
+  plane: rrect(-110 * LS, -70 * LS, 220 * LS, 140 * LS, 14 * LS),
+  card: rrect(630, 600, 340, 80, 22),
+};
+const TOP = LY.order.length - 1;
+const layerY = (i, sp) => 640 + (TOP / 2 - i) * 38 * LS * sp;
+const iso = yc => (u, v) => [800 + (u - v) * .52, yc + (u + v) * .26];
+
+function bbox(sc) {
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+  const add = (x, y, r = 0) => { x0 = Math.min(x0, x - r); y0 = Math.min(y0, y - r); x1 = Math.max(x1, x + r); y1 = Math.max(y1, y + r); };
+  for (const s of sc.slots) if (s) for (const p of s.pts) add(p[0], p[1]);
+  for (const d of sc.dots) add(d.x, d.y, d.r);
+  return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w: x1 - x0, h: y1 - y0 };
+}
+const BB = Object.fromEntries(LY.order.map(k => [k, bbox(SC[k])]));
+// a stage's finished scene, scaled to fit w×h around the origin and passed through map(u, v)
+function placed(key, { w, h, map }) {
+  const b = BB[key], k = Math.min(w / b.w, h / b.h);
+  const P = (px, py) => map((px - b.cx) * k, (py - b.cy) * k);
+  return {
+    slots: SC[key].slots.map(z => z && { ...z, pts: z.pts.map(p => P(p[0], p[1])) }),
+    dots: SC[key].dots.map(d => { const [px, py] = P(d.x, d.y); return D(px, py, d.r * Math.max(k, .5)); }),
+  };
+}
+function drawScene(sc, { alpha = 1, draw = 1, lwk = .85 } = {}) {
+  if (alpha <= .002 || draw <= 0) return;
+  for (const s of sc.slots) if (s) strokeShape(draw < 1 ? { ...s, fill: s.fill * draw, pts: s.pts.slice(0, Math.max(2, Math.ceil(s.pts.length * draw))) } : s, alpha, lwk);
+  for (const d of sc.dots) dot(d.x, d.y, d.r * Math.min(1, draw * 1.5), alpha);
+}
+const ICON_W = 170 * LS, ICON_H = 100 * LS;
+
+function drawLayers(t) {
+  const sp = 1 - ease(seg(t, 20.9, 21.6));
+  LY.order.forEach((key, i) => {
+    const top = i === TOP;
+    const rise = top ? ease(seg(t, 18.6, 19.0)) : ease(seg(t, 18.45 + i * .1, 19.15 + i * .1));
+    if (rise <= 0) return;
+    const pk = bump(t, 19.9 + i * .12, .14);
+    const yc = layerY(i, sp) + (1 - rise) * 16 - 12 * pk, P = iso(yc);
+    const flat = top ? ease(seg(t, 21.5, 22.3)) : 0;
+    const planeA = rise * (top ? 1 : 1 - seg(t, 21.35, 21.6));
+    const pts = LY.plane.map(([u, v], n) => { const [x, y] = P(u, v); return [lerp(x, LY.card[n][0], flat), lerp(y, LY.card[n][1], flat)]; });
+    strokeShape({ pts, op: 1, lw: 1 + .6 * pk, col: 0, fill: 0 }, planeA, 1, .6);
+    if (top && t < HANDOFF) return;
+    const ia = (top ? 1 : rise) * (1 - seg(t, 20.9, 21.3));
+    if (ia > 0) drawScene(placed(key, { w: ICON_W, h: ICON_H, map: P }), { alpha: ia, draw: top ? 1 : rise });
+  });
+  const a = ease(seg(t, 22.1, 22.6));
+  if (a > 0) wordmark(MARK, 800, 640 + 6 * (1 - a), a);   // card centre is (800, 640)
+}
+
+SC.s5aEnd = placed('s5a', { w: ICON_W, h: ICON_H, map: iso(layerY(TOP, 1)) });
+KF = [...BASE_KF, [HANDOFF, 's5aEnd'], [DURATION - INTRO, 's5aEnd']];
+
+// ---------- playback ----------
+// plays once and rests on the final frame with a replay button; ?loop=1 loops instead
+const LOOP = params.get('loop') === '1';
+let playing = true, ended = false, start = performance.now(), pausedAt = 0;
+const $ = id => document.getElementById(id);
+function tick(now) {
+  if (!exportSize) {
+    let t = pausedAt;
+    if (playing) {
+      const el = (now - start) / 1000;
+      if (LOOP) t = el % DURATION;
+      else if (el >= DURATION) { t = DURATION - 1e-3; finish(); }
+      else t = el;
+    }
+    draw(t, LOOP);
+    $('time').textContent = t.toFixed(1) + 's';
+    $('bar').style.width = (t / DURATION * 100) + '%';
+  }
+  requestAnimationFrame(tick);
+}
+function finish() {
+  playing = false; ended = true; pausedAt = DURATION - 1e-3;
+  $('play').textContent = 'Play';
+  $('replay').classList.add('show');
+}
+function togglePlay() {
+  if (ended) return restart();
+  if (playing) { pausedAt = ((performance.now() - start) / 1000) % DURATION; playing = false; }
+  else { start = performance.now() - pausedAt * 1000; playing = true; }
+  $('play').textContent = playing ? 'Pause' : 'Play';
+}
+function restart() {
+  ended = false; $('replay').classList.remove('show');
+  start = performance.now(); pausedAt = 0; if (!playing) togglePlay();
+}
+function toggleLabels() { showLabels = !showLabels; $('labels').setAttribute('aria-pressed', showLabels); }
+function toggleBg() { transparent = !transparent; document.body.classList.toggle('transparent', transparent); $('bgbtn').setAttribute('aria-pressed', transparent); }
+
+async function record() {
+  const types = ['video/mp4;codecs=avc1.640028', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+  const mime = types.find(m => window.MediaRecorder && MediaRecorder.isTypeSupported(m));
+  if (!mime) { alert('This browser cannot record canvas video. Try Chrome.'); return; }
+  exportSize = [1920, 1080];
+  const prev = [cv.width, cv.height];
+  cv.width = 1920; cv.height = 1080;
+  $('rec').textContent = 'Recording…'; $('rec').disabled = true;
+  const stream = cv.captureStream(60);
+  const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 12e6 });
+  const chunks = []; rec.ondataavailable = e => e.data.size && chunks.push(e.data);
+  const done = new Promise(r => rec.onstop = r);
+  draw(0, false); rec.start();
+  const t0 = performance.now();
+  await new Promise(res => {
+    const step = now => {
+      const t = (now - t0) / 1000;
+      draw(Math.min(t, DURATION - 1e-3), false);
+      $('time').textContent = Math.min(t, DURATION).toFixed(1) + 's';
+      if (t < DURATION + .2) requestAnimationFrame(step); else res();
+    };
+    requestAnimationFrame(step);
+  });
+  rec.stop(); await done;
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(chunks, { type: mime }));
+  a.download = `product-design-process-${DURATION}s.` + (mime.includes('mp4') ? 'mp4' : 'webm');
+  a.click();
+  exportSize = null; [cv.width, cv.height] = prev; resize();
+  $('rec').textContent = 'Record 1080p'; $('rec').disabled = false;
+  restart();
+}
+
+$('play').onclick = togglePlay; $('restart').onclick = restart; $('labels').onclick = toggleLabels;
+$('bgbtn').onclick = toggleBg; $('rec').onclick = record;
+$('replay').onclick = restart;
+addEventListener('keydown', e => {
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  else if (e.key === 'r') restart(); else if (e.key === 'l') toggleLabels(); else if (e.key === 'b') toggleBg();
+});
+// auto-hide controls
+let idle; const ui = $('ui');
+const wake = () => { if (params.get('clean') === '1') return; ui.classList.remove('hidden'); clearTimeout(idle); idle = setTimeout(() => ui.classList.add('hidden'), 2200); };
+addEventListener('mousemove', wake); addEventListener('touchstart', wake);
+if (params.get('clean') === '1') ui.classList.add('hidden'), $('bar').style.display = 'none'; else wake();
+$('labels').setAttribute('aria-pressed', showLabels);
+if (transparent) { document.body.classList.add('transparent'); $('bgbtn').setAttribute('aria-pressed', true); }
+// expose for frame-accurate capture tools: window.renderAt(seconds)
+window.renderAt = t => { playing = false; pausedAt = t; draw(t, false); };
+
+document.fonts && document.fonts.load(WORDMARK_FONT, MARK).catch(() => {});
+resize(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
