@@ -14,9 +14,9 @@ function ProcessAnimation() {
   return (
     <div
       ref={ref}
-      className="relative left-1/2 w-[min(998px,calc(100vw-64px))] -translate-x-1/2 pb-[120px]"
+      className="relative left-1/2 w-[min(998px,calc(100vw-64px))] -translate-x-1/2 pt-[60px] pb-[120px]"
     >
-      <div className="aspect-[16/9] w-full">
+      <div className="aspect-square w-full sm:aspect-[16/9]">
         {inView && (
           <iframe
             src={`${processAnimationUrl}?clean=1`}

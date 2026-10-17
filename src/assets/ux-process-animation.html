@@ -13,7 +13,7 @@
   /* The play icon itself is drawn on the canvas (the layers morph into it); this button is
      only the invisible click/keyboard target sitting exactly over it. */
   #replay {
-    position: absolute; left: 50%; top: calc(640 / 900 * 100%);
+    position: absolute; left: 50%; top: 50%;
     width: max(44px, calc(112px * var(--u, 1))); height: max(32px, calc(80px * var(--u, 1))); border-radius: calc(24px * var(--u, 1));
     border: 0; padding: 0; background: transparent; color: #111; cursor: pointer;
     opacity: 0; pointer-events: none; transform: translate(-50%, -50%);
@@ -332,14 +332,23 @@ const cv = document.getElementById('c'), ctx = cv.getContext('2d');
 let transparent = params.get('bg') === 'transparent', showLabels = params.get('labels') === '1';
 let exportSize = null;
 
+// The artwork only fills the middle of the 1600x900 drawing space, so the canvas is sized to
+// the frame it is shown in and the view is zoomed onto the artwork around (VIEW_CX, VIEW_CY).
+// Wide 16:9 frames show it 1.3x larger than the plain fit; tall or square frames (phones)
+// fit the artwork's own bounds (CONTENT_W x CONTENT_H units) to the frame instead.
+const VIEW_CX = 800, VIEW_CY = 640;
+const CONTENT_W = 520, CONTENT_H = 480;
+// pixels per drawing unit for a frame of cw x ch pixels
+function fit(cw, ch) {
+  return cw / ch > 1.5 ? 1.3 * cw / W : Math.min(cw / CONTENT_W, ch / CONTENT_H);
+}
+
 function resize() {
   if (exportSize) return;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const s = Math.min(innerWidth / W, innerHeight / H);
-  cv.style.width = W * s + 'px'; cv.style.height = H * s + 'px';
-  document.getElementById('frame').style.setProperty('--s', s * 1600 / 1920);
-  document.getElementById('frame').style.setProperty('--u', s);
-  cv.width = Math.round(W * s * dpr); cv.height = Math.round(H * s * dpr);
+  cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px';
+  cv.width = Math.round(innerWidth * dpr); cv.height = Math.round(innerHeight * dpr);
+  document.getElementById('frame').style.setProperty('--u', fit(innerWidth, innerHeight));
 }
 addEventListener('resize', resize);
 
@@ -381,11 +390,13 @@ function label(str, x, y, size, a = 1, weight = 600, spacing = 0) {
   if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
 }
 function draw(t, loopFade) {
-  K = cv.width / W; LW = BASE_LW * cv.width / 1920;
+  K = fit(cv.width, cv.height);
+  // line width follows the artwork's scale, with a floor so strokes stay visible on small phones
+  LW = Math.max(BASE_LW * K * W / 1920, 1.25 * Math.min(window.devicePixelRatio || 1, 2));
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, cv.width, cv.height);
   if (!transparent) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); }
-  ctx.setTransform(K, 0, 0, K, 0, 0);
+  ctx.setTransform(K, 0, 0, K, cv.width / 2 - VIEW_CX * K, cv.height / 2 - VIEW_CY * K);
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   G = loopFade ? 1 - clamp01((t - (DURATION - .3)) / .3) : 1;
   const real = t;
