@@ -5,27 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Product Design Process</title>
 <style>
-  /* final wordmark: uses the locally installed Hero New Regular, falls back to system sans */
-  @font-face { font-family: 'Hero New'; src: local('Hero New Regular'), local('HeroNew-Regular'); font-weight: 400; font-style: normal; }
   :root { --bg: #ffffff; --ink: #111111; --muted: #8a8a8a; }
   html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; }
   body.transparent { background: repeating-conic-gradient(#eee 0 25%, #fff 0 50%) 0 0 / 20px 20px; }
   #stage { position: absolute; inset: 0; display: grid; place-items: center; }
   #frame { position: relative; }
+  /* The play icon itself is drawn on the canvas (the layers morph into it); this button is
+     only the invisible click/keyboard target sitting exactly over it. */
   #replay {
-    position: absolute; left: 50%; top: calc(742 / 900 * 100%);
-    width: max(40px, calc(56px * var(--s, 1))); aspect-ratio: 1; border-radius: 50%;
-    border: max(1.5px, calc(2.5px * var(--s, 1))) solid #111; padding: 0; background: #fff; color: #111; cursor: pointer;
-    display: grid; place-items: center;
-    transform: translate(-50%, -50%) scale(.85); opacity: 0; pointer-events: none;
-    transition: opacity .35s ease, transform .35s cubic-bezier(.2,.8,.2,1), background .15s;
+    position: absolute; left: 50%; top: calc(640 / 900 * 100%);
+    width: max(44px, calc(112px * var(--u, 1))); height: max(32px, calc(80px * var(--u, 1))); border-radius: calc(24px * var(--u, 1));
+    border: 0; padding: 0; background: transparent; color: #111; cursor: pointer;
+    opacity: 0; pointer-events: none; transform: translate(-50%, -50%);
+    transition: background .15s, transform .15s;
   }
-  #replay.show { opacity: 1; transform: translate(-50%, -50%) scale(1); pointer-events: auto; }
-  #replay:hover { background: #f2f2f2; }
+  #replay.show { opacity: 1; pointer-events: auto; }
+  #replay:hover { background: rgba(17,17,17,.05); }
   #replay:active { transform: translate(-50%, -50%) scale(.94); }
   #replay:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
-  #replay svg { width: 38%; height: 38%; overflow: visible; transform: translateX(2px); }
-  #replay path { fill: none; stroke: currentColor; stroke-width: max(1.5px, calc(2.5px * var(--s, 1))); stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  #replay svg { display: none; }
   canvas { display: block; }
   #ui {
     position: fixed; right: 16px; bottom: 16px; display: flex; gap: 6px; align-items: center;
@@ -61,10 +59,9 @@
    25s product-design-process morph. Everything is drawn from a fixed pool of
    "slots" (polylines with an equal point count) plus a pool of dots,
    so every icon is a true point-by-point morph of the previous one.
-   URL params: ?mark=Text  ?labels=1  ?bg=transparent  ?clean=1  ?loop=1
+   URL params: ?labels=1  ?bg=transparent  ?clean=1  ?loop=1
 ------------------------------------------------------------------- */
 const params = new URLSearchParams(location.search);
-const MARK = (params.get('mark') || 'Product Design').slice(0, 24);
 const W = 1600, H = 900;
 const DURATION = 25;
 // The opening single dot holds and breathes for INTRO extra seconds; every other timing
@@ -341,6 +338,7 @@ function resize() {
   const s = Math.min(innerWidth / W, innerHeight / H);
   cv.style.width = W * s + 'px'; cv.style.height = H * s + 'px';
   document.getElementById('frame').style.setProperty('--s', s * 1600 / 1920);
+  document.getElementById('frame').style.setProperty('--u', s);
   cv.width = Math.round(W * s * dpr); cv.height = Math.round(H * s * dpr);
 }
 addEventListener('resize', resize);
@@ -372,18 +370,6 @@ function box(cx, cy, w, h, r, { a = 1, lwk = 1, fill = 0 } = {}) {
   ctx.beginPath(); ctx.roundRect(cx - w / 2, cy - h / 2, w, h, Math.min(r, w / 2, h / 2));
   if (fill > .002) { ctx.globalAlpha = a * fill * G; ctx.fillStyle = gray(0); ctx.fill(); }
   ctx.globalAlpha = a * G; ctx.strokeStyle = gray(0); ctx.lineWidth = LW * lwk / K; ctx.stroke();
-}
-// text centred on (cx, cy) by its actual ink bounds, not the em box
-const WORDMARK_FONT = '400 34px "Hero New", Inter, system-ui, -apple-system, Helvetica, sans-serif';
-function wordmark(str, cx, cy, a = 1) {
-  if (a <= .002) return;
-  ctx.globalAlpha = a * G; ctx.fillStyle = gray(0); ctx.font = WORDMARK_FONT;
-  ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
-  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
-  const m = ctx.measureText(str);
-  const x = cx - (m.actualBoundingBoxRight - m.actualBoundingBoxLeft) / 2;
-  const y = cy + (m.actualBoundingBoxAscent - m.actualBoundingBoxDescent) / 2;
-  ctx.fillText(str, x, y);
 }
 function label(str, x, y, size, a = 1, weight = 600, spacing = 0) {
   if (a <= .002) return;
@@ -445,7 +431,10 @@ const LS = 1.25;   // overall size of the layer stack
 const LY = {
   order: ['s0c', 'sc', 's1', 's2', 's3', 'sv', 's4', 's5a'],
   plane: rrect(-110 * LS, -70 * LS, 220 * LS, 140 * LS, 14 * LS),
-  card: rrect(630, 600, 340, 80, 22),
+  // the finished play icon: the top layer becomes a rounded rectangle (same outline family as
+  // the layers, so it morphs cleanly), the layer under it the triangle
+  frame: rrect(800 - 56, 640 - 40, 112, 80, 24),
+  tri: poly([800 - 10.9 + 4.3, 640 - 11.6], [800 + 10.9 + 4.3, 640], [800 - 10.9 + 4.3, 640 + 11.6], [800 - 10.9 + 4.3, 640 - 11.6]),
 };
 const TOP = LY.order.length - 1;
 const layerY = (i, sp) => 640 + (TOP / 2 - i) * 38 * LS * sp;
@@ -483,16 +472,19 @@ function drawLayers(t) {
     if (rise <= 0) return;
     const pk = bump(t, 19.9 + i * .12, .14);
     const yc = layerY(i, sp) + (1 - rise) * 16 - 12 * pk, P = iso(yc);
-    const flat = top ? ease(seg(t, 21.5, 22.3)) : 0;
-    const planeA = rise * (top ? 1 : 1 - seg(t, 21.35, 21.6));
-    const pts = LY.plane.map(([u, v], n) => { const [x, y] = P(u, v); return [lerp(x, LY.card[n][0], flat), lerp(y, LY.card[n][1], flat)]; });
-    strokeShape({ pts, op: 1, lw: 1 + .6 * pk, col: 0, fill: 0 }, planeA, 1, .6);
+    const target = top ? LY.frame : i === TOP - 1 ? LY.tri : null;
+    const flat = target ? ease(seg(t, 21.5, 22.3)) : 0;
+    const planeA = rise * (target ? 1 : 1 - seg(t, 21.35, 21.6));
+    const pts = LY.plane.map(([u, v], n) => {
+      const [x, y] = P(u, v);
+      return target ? [lerp(x, target[n][0], flat), lerp(y, target[n][1], flat)] : [x, y];
+    });
+    // the white backing drains away as the planes become the icon, so the triangle shows through the frame
+    strokeShape({ pts, op: 1, lw: 1 + .6 * pk, col: 0, fill: 0 }, planeA, 1, .6 * (1 - flat));
     if (top && t < HANDOFF) return;
     const ia = (top ? 1 : rise) * (1 - seg(t, 20.9, 21.3));
     if (ia > 0) drawScene(placed(key, { w: ICON_W, h: ICON_H, map: P }), { alpha: ia, draw: top ? 1 : rise });
   });
-  const a = ease(seg(t, 22.1, 22.6));
-  if (a > 0) wordmark(MARK, 800, 640 + 6 * (1 - a), a);   // card centre is (800, 640)
 }
 
 SC.s5aEnd = placed('s5a', { w: ICON_W, h: ICON_H, map: iso(layerY(TOP, 1)) });
@@ -586,7 +578,6 @@ if (transparent) { document.body.classList.add('transparent'); $('bgbtn').setAtt
 // expose for frame-accurate capture tools: window.renderAt(seconds)
 window.renderAt = t => { playing = false; pausedAt = t; draw(t, false); };
 
-document.fonts && document.fonts.load(WORDMARK_FONT, MARK).catch(() => {});
 resize(); requestAnimationFrame(tick);
 </script>
 </body>

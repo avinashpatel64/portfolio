@@ -19,7 +19,7 @@ function ProcessAnimation() {
       <div className="aspect-[16/9] w-full">
         {inView && (
           <iframe
-            src={`${processAnimationUrl}?clean=1&mark=${encodeURIComponent('Product Design')}`}
+            src={`${processAnimationUrl}?clean=1`}
             title="Product design process animation"
             scrolling="no"
             className="size-full border-0"
