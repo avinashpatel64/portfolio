@@ -10,22 +10,24 @@ import processAnimationUrl from '../assets/ux-process-animation.html?url'
 function ProcessAnimation() {
   const [ref, inView] = useInView()
   return (
-    <div ref={ref} className="mx-auto aspect-[16/9] w-full max-w-3xl">
-      {inView && (
-        <iframe
-          src={`${processAnimationUrl}?clean=1&mark=${encodeURIComponent('Product Design')}`}
-          title="Product design process animation"
-          scrolling="no"
-          className="size-full border-0"
-        />
-      )}
+    <div ref={ref} className="mx-auto w-full max-w-3xl pb-[60px]">
+      <div className="aspect-[16/9] w-full">
+        {inView && (
+          <iframe
+            src={`${processAnimationUrl}?clean=1&mark=${encodeURIComponent('Product Design')}`}
+            title="Product design process animation"
+            scrolling="no"
+            className="size-full border-0"
+          />
+        )}
+      </div>
     </div>
   )
 }
 
 export default function About() {
   return (
-    <section id="about" className="mx-auto max-w-4xl px-6 pt-20 text-center sm:px-10">
+    <section id="about" className="mx-auto max-w-4xl px-6 pt-5 text-center sm:px-10">
       <h2 className="sr-only">Avinash Patel</h2>
       <ProcessAnimation />
 
